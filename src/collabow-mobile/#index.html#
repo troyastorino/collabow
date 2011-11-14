@@ -1,6 +1,7 @@
 <!doctype html>
 <html>
   <head>
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width" />
     <title>Collabow Mobile Version 0.1</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js" type="text/javascript" charset="utf-8"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js" type="text/javascript" charset="utf-8"></script>
@@ -11,11 +12,13 @@
     
   </head>
   <body>
+    <div id="title_bar"><strong>Collab</strong>ow Training App</div>
     <div id="wrapper">
+      <p>Test 1</p>
       <div id="my-ink">
       </div>
-    </div>
-    <p> Let's hope this works </p
+      <p>Test 2</p>
+    </divf>
   </body>
 </html>
    

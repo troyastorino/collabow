@@ -16,9 +16,14 @@
              [:title "collabow"]
              (map #(get includes %) incls)])
 
-(defpartial layout [includes & content]
+(defhtml includes-layout [includes & content]
             (html5
               (build-head  (into [:style :jquery :jquery-ui] includes))
               [:body
+               [:header
+                [:h1 "Colla" [:strong "bow"] " Training Mode"]]
                [:div#wrapper
                 content]]))
+
+(defhtml layout [content]
+  (includes-layout [] content))
