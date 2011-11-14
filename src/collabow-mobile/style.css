@@ -1,0 +1,26 @@
+body {
+background-color:#FFFFFF;
+font-family:"Arial";
+color:#303030;
+font-size:14px;
+}
+
+h1
+{
+color:#33CCCC;
+text-align:left;
+font-size:48px;
+}
+
+h3
+{
+color:#33CCCC;
+font-size:22px;
+margin:25px;
+}
+
+p
+{
+padding:10px;
+margin:10px;
+}
