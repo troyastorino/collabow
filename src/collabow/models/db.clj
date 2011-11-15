@@ -3,7 +3,6 @@
   (:import java.net.URI))
 
 (defn init-db!
-  ([] (init-db! {}))
   ([{:keys [url]}] (def db (redis/init {:url url}))))
 
 (defn set-strokes [strokes]
