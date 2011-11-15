@@ -1,20 +1,34 @@
-var mouseDown = false;
+// If the user in drawing a stroke, stops reloads of canvas
+var stopReloads = false;
 
-function sendData() {
-  $.post("/ink/store-data", {data: $('#my-ink').ink("serialize")},
-        function(data) {
-          console.log(data);
-          drawData();
-          mouseDown = false
-        });
+function sendStrokes() {
+  strokes = $("#my-ink").ink("serialize");
+  $.ajax({
+    type: "POST",
+    url: "/ink/store-data",
+    async: false,
+    data: {data: strokes},
+    success: function(data) {
+      draw(data);
+      stopReloads = false;
+      console.log("sent data");
+    }
+  });
 }
 
-function drawData() {
-  if (!mouseDown) {
-    $.get("ink/data", function(data) {
-      $("#my-ink").ink("deserialize",data, true);
-    });
-  }
+function draw(strokes) {
+  $("#my-ink").ink("deserialize", strokes, true);}
+
+function reloadCanvas() {
+  $.ajax({
+    type: "GET",
+    url: "ink/data",
+    async: false,
+    success: function(data) {
+      draw(data);
+      console.log("canvas reload");
+    }
+  });
 }
 
 $(document).ready(function() {
@@ -30,20 +44,24 @@ $(document).ready(function() {
   $("#my-ink").ink({
     mode: "write",
     rightMode: "erase",
-    onStrokeAdded: sendData,
-    onStrokesErased: sendData
+    onStrokeAdded: sendStrokes,
+    onStrokesErased: sendStrokes
   });
 
-  //set interval for redrawing 
-  setInterval(drawData, 50);
+  //set interval for canvas refresh
+  setInterval(function() {
+    if(!stopReloads) {
+      reloadCanvas();
+    }
+  }, 50);
 
   //bind clearing of the screen to click event
   $("#clear").click(function() {
     $("#my-ink").ink("clear", true);
-    sendData();
+    sendStrokes();
   });
 
   $("#my-ink canvas").mousedown(function() {
-    mouseDown = true
+    stopReloads = true
   });
 });

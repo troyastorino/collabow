@@ -18,7 +18,7 @@ $(document).ready(function() {
   
   //gets values from window size
   x = $(window).width()-40
-  y = $(window).height()-180
+  y = $(window).height()-140
 
   
   //grab div element and create canvas with variables
