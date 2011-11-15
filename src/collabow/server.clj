@@ -7,6 +7,7 @@
 (defn -main [& m]
   (let [mode (keyword (or (first m) :dev))
         port (Integer. (get (System/getenv) "PORT" "8080"))]
+    (println mode)
     (db/init-db! (case mode
                    :dev {}
                    :prod {:url (get (System/getenv) "REDISTOGO_URL")}))

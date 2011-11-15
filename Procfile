@@ -1,1 +1,1 @@
-web: lein run :prod
+web: lein run prod
