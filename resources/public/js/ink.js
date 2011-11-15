@@ -9,9 +9,7 @@ function sendStrokes() {
     async: false,
     data: {data: strokes},
     success: function(data) {
-      draw(data);
       stopReloads = false;
-      console.log("sent data");
     }
   });
 }
@@ -26,7 +24,6 @@ function reloadCanvas() {
     async: false,
     success: function(data) {
       draw(data);
-      console.log("canvas reload");
     }
   });
 }
@@ -53,7 +50,7 @@ $(document).ready(function() {
     if(!stopReloads) {
       reloadCanvas();
     }
-  }, 50);
+  }, 10);
 
   //bind clearing of the screen to click event
   $("#clear").click(function() {
