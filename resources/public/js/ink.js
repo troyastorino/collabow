@@ -28,14 +28,18 @@ function reloadCanvas() {
   });
 }
 
-$(document).ready(function() {
+function resizeInkDiv() {
   //gets values from window size
   x = $(window).width()-40
-  y = $(window).height()-180
+  y = $(window).height()-140
 
   //grab div element and create canvas with variables
   $("#my-ink").height(y+"px");
   $("#my-ink").width(x+"px");
+}
+
+$(document).ready(function() {
+  resizeInkDiv();
 
   //create the ink widget
   $("#my-ink").ink({
@@ -52,12 +56,27 @@ $(document).ready(function() {
     }
   }, 10);
 
-  //bind clearing of the screen to click event
+  //bind handlers to tool buttons
   $("#clear").click(function() {
     $("#my-ink").ink("clear", true);
     sendStrokes();
   });
 
+  $("#pencil").click(function() {
+    $("#my-ink").ink("option", "mode", "write");
+  });
+
+  $("#eraser").click(function() {
+    $("#my-ink").ink("option", "mode", "erase");
+  });
+
+  //bind window resize to canvas resize
+  $(window).resize(function() {
+    resizeInkDiv();
+    $("#my-ink").ink("resize", true);
+  })
+
+  //stop reloading while drawing
   $("#my-ink canvas").mousedown(function() {
     stopReloads = true
   });

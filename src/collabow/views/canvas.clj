@@ -9,9 +9,11 @@
   (common/includes-layout
    [:jquery-ink :ink.js]
    [:img#arrow {:src "/img/arrow.png" :alt "Start sketching!"}]
-   [:div#my-ink]
-   [:p "Version 0.1 MADesigns"]
-   [:button#clear "Clear"]))
+   [:div#tools
+    [:button#pencil "Sketch"]
+    [:button#eraser "Erase"]
+    [:button#clear "Clear"]]
+   [:div#my-ink]))
 
 (defpage [:post "/ink/store-data"] {:keys [data]}
   (do

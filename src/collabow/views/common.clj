@@ -14,10 +14,14 @@
 (defhtml build-head [incls]
             [:head
              [:title "collabow"]
+             [:link {:rel "icon" :href "/img/favicon.ico"}]
              (map #(get includes %) incls)])
 
 (defhtml header []
-  [:header [:h1 [:img#logo {:src "/img/collogo.png" :alt "logo"}] "&alpha;"]])
+  [:header [:h1 [:img#logo {:src "/img/collogo.png" :alt "logo"}]]])
+
+(defhtml footer []
+  [:footer [:p "Version 0.1 MADesigns"]])
 
 (defhtml includes-layout [includes & content]
             (html5
@@ -25,7 +29,8 @@
               [:body
                (header)
                [:div#wrapper
-                content]]))
+                content]
+               (footer)]))
 
 (defhtml layout [content]
   (includes-layout [] content))
