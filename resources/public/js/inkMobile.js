@@ -1,13 +1,11 @@
 // If the user in drawing a stroke, stops reloads of canvas
 var stopReloads = false;
 
-var sketchMode = true;
-
 function sendStrokes() {
   strokes = $("#my-ink").ink("serialize");
   $.ajax({
     type: "POST",
-    url: "/ink/store-data",
+    url: "http://collabow.herokuapp.com/ink/store-data",
     async: false,
     data: {data: strokes},
     success: function(data) {
@@ -22,7 +20,7 @@ function draw(strokes) {
 function reloadCanvas() {
   $.ajax({
     type: "GET",
-    url: "ink/data",
+    url: "http://collabow.herokuapp.com/ink/data",
     async: false,
     success: function(data) {
       draw(data);
@@ -56,7 +54,7 @@ $(document).ready(function() {
     if(!stopReloads) {
       reloadCanvas();
     }
-  }, 10);
+  }, 500);
 
   //bind handlers to tool buttons
   $("#clear").click(function() {
@@ -64,21 +62,13 @@ $(document).ready(function() {
     sendStrokes();
   });
 
-  $("#eraser").click(setEraseMode);
-  
-  function setSketchMode() {
+  $("#pencil").click(function() {
     $("#my-ink").ink("option", "mode", "write");
-    $("#pencil").replaceWith("<img id='pencil-selected' class='button' src='img/pencilSELECT.png' alt='Currently in sketch mode' />");
-    $("#eraser-selected").replaceWith("<img id='eraser' class='button' src='img/eraser.png' alt='Erase' />");
-    $("#eraser").click(setEraseMode);
-  }
+  });
 
-  function setEraseMode() {
+  $("#eraser").click(function() {
     $("#my-ink").ink("option", "mode", "erase");
-    $("#pencil-selected").replaceWith("<img id='pencil' class='button' src='img/pencil.png' alt='Sketch' />");
-    $("#eraser").replaceWith("<img id='eraser-selected'class='button' src='img/eraserSELECT.png' alt='Currently in erasing mode' />");
-    $("#pencil").click(setSketchMode);
-  }
+  });
 
   //bind window resize to canvas resize
   $(window).resize(function() {

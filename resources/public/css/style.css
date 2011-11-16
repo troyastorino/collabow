@@ -7,7 +7,7 @@ div#my-ink
 div#tools {
     position: absolute;
     right: 20px;
-    top: -30px;
+    top: -70px;
 }
 
 body {
@@ -54,4 +54,9 @@ div#wrapper {
     left:30px;
     position:absolute;
     height:100px;
+}
+
+.button {
+	height:50px;
+	margin-right:20px;
 }
