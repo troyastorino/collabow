@@ -1,7 +1,8 @@
 (ns collabow.views.canvas
   (:require [collabow.views.common :as common]
             [collabow.models.db :as db]
-            [collabow.models.strokes :as strokes])
+            [collabow.models.strokes :as strokes]
+            [clojure.data.json :as json])
   (:use [noir.core :only [defpage]]
         [hiccup.core :only [html]]
         [hiccup.form-helpers :only [form-to hidden-field submit-button]]))
@@ -26,13 +27,13 @@
   (str (db/get-strokes)))
 
 (defpage [:post "/ink/add-stroke"] {:keys [data]}
-  (db/add-stroke! (str data)))
+  (str (db/add-stroke! data)))
 
 (defpage [:post "/ink/remove-stroke"] {:keys [data]}
-  (db/rm-stroke! data))
+  (str (db/rm-stroke! data)))
 
 (defpage "/ink/strokes" []
-  (strokes/seq->str (db/get-strokes-set)))
+  (json/json-str (vec (db/get-strokes-set))))
 
-(defpage [:post "/ink/strokes/clear"] []
-  (db/clear-strokes-set))
+(defpage [:post "/ink/clear-strokes"] []
+  (str (db/clear-strokes-set)))
