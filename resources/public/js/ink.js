@@ -1,6 +1,7 @@
 // If the user is drawing a stroke, stops reloads of canvas
 var stopReloads = false;
 var strokes = [];
+var url;
 
 function splitStrokes(serializedStrokes) {
   pattern = /\([^\(\)]+\)/g;
@@ -17,9 +18,10 @@ function strokesArray() {
 //sends the stroke to the server.  added is a boolean: true for a new
 //stroke, false for a erased stroke
 function sendStroke(stroke, added) {
+  ext = added ? "add-stroke" : "remove-stroke";
   $.ajax({
     type: "POST",
-    url: added ? "/ink/add-stroke" : "/ink/remove-stroke",
+    url: insertPath(url, ext),
     async: false,
     data: {data: stroke},
     success: function(data) {
@@ -61,7 +63,7 @@ function draw() {
 function clearStrokes() {
   $.ajax({
     type: "POST",
-    url: "/ink/clear-strokes",
+    url: insertPath(url, "clear-strokes"),
     async: false,
     data: {},
     success: function(data) {
@@ -74,7 +76,7 @@ function clearStrokes() {
 function reloadCanvas() {
   $.ajax({
     type: "GET",
-    url: "ink/strokes",
+    url: insertPath(url, "strokes"),
     async: false,
     dataType: "json",
     success: function(data) {
@@ -96,20 +98,21 @@ function resizeInkDiv() {
 
 function setSketchMode() {
   $("#my-ink").ink("option", "mode", "write");
-  $("#pencil").replaceWith("<img id='pencil-selected' class='button' src='img/pencilSELECT.png' alt='Currently in sketch mode' />");
-  $("#eraser-selected").replaceWith("<img id='eraser' class='button' src='img/eraser.png' alt='Erase' />");
+  $("#pencil").replaceWith("<img id='pencil-selected' class='button' src='/img/pencilSELECT.png' alt='Currently in sketch mode' />");
+  $("#eraser-selected").replaceWith("<img id='eraser' class='button' src='/img/eraser.png' alt='Erase' />");
   $("#eraser").click(setEraseMode);
 }
 
 function setEraseMode() {
   $("#my-ink").ink("option", "mode", "erase");
-  $("#pencil-selected").replaceWith("<img id='pencil' class='button' src='img/pencil.png' alt='Sketch' />");
-  $("#eraser").replaceWith("<img id='eraser-selected'class='button' src='img/eraserSELECT.png' alt='Currently in erasing mode' />");
+  $("#pencil-selected").replaceWith("<img id='pencil' class='button' src='/img/pencil.png' alt='Sketch' />");
+  $("#eraser").replaceWith("<img id='eraser-selected'class='button' src='/img/eraserSELECT.png' alt='Currently in erasing mode' />");
   $("#pencil").click(setSketchMode);
 }
 
-
 $(document).ready(function() {
+  url = getURL();
+
   resizeInkDiv();
 
   //create the ink widget
@@ -125,7 +128,7 @@ $(document).ready(function() {
     if(!stopReloads) {
       reloadCanvas();
     }
-  }, 1000);
+  }, 10);
 
   //bind handlers to tool buttons
   $("#clear").click(function() {

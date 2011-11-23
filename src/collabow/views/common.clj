@@ -7,9 +7,11 @@
                :jquery-ui (include-js "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js")
                :jquery-ink (include-js "/lib/jquery-ink.js")
                :reset (include-css "/css/reset.css")
-               :style (include-css "/css/style.css")
-               :canvas.js (include-js "/js/canvas.js")
-               :ink.js (include-js "/js/ink.js")})
+               :style (include-css "/css/styleV3.css")
+               :landing (include-css "/css/styleLanding.css")
+               :util.js (include-js "/js/util.js")
+               :ink.js (include-js "/js/ink.js")
+               :welcome.js (include-js "/js/welcome.js")})
 
 (defhtml build-head [incls]
             [:head
@@ -18,19 +20,21 @@
              (map #(get includes %) incls)])
 
 (defhtml header []
-  [:header [:h1 [:img#logo {:src "/img/collogo.png" :alt "logo"}]]])
+  [:header
+   [:h1 [:img#logo {:src "/img/logo4.png" :alt "logo"}]]
+   [:h3#tagline "brainstorm real-time with anyone anywhere."]])
 
 (defhtml footer []
-  [:footer [:p "Version 0.1 MADesigns"]])
+  [:footer [:p "&#8226;&#8226;&#8226; Version 0.0.1alpha3 MADesigns &#8226;&#8226;&#8226"]])
 
 (defhtml includes-layout [includes & content]
             (html5
-              (build-head  (into [:style :jquery :jquery-ui] includes))
+              (build-head  (into [:style :jquery :jquery-ui :util.js] includes))
               [:body
                (header)
                [:div#wrapper
                 content]
                (footer)]))
 
-(defhtml layout [content]
+(defhtml layout [& content]
   (includes-layout [] content))

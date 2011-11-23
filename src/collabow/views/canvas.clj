@@ -4,18 +4,20 @@
             [collabow.models.strokes :as strokes]
             [clojure.data.json :as json])
   (:use [noir.core :only [defpage]]
-        [hiccup.core :only [html]]
+        [hiccup.core :only [html defhtml]]
         [hiccup.form-helpers :only [form-to hidden-field submit-button]]))
 
-(defpage "/ink" []
-  (common/includes-layout
-   [:jquery-ink :ink.js]
-   [:img#arrow {:src "/img/arrow.png" :alt "Start sketching!"}]
+(defhtml canvas []
+  (common/includes-layout   [:jquery-ink :ink.js]
+   [:img#arrow {:src "/img/arrowBlue.png" :alt "Start sketching!"}]
    [:div#tools
-    [:img#pencil-selected.button {:src "img/pencilSELECT.png" :alt "Currently in sketch mode"}]
-    [:img#eraser.button {:src "img/eraser.png" :alt "Erase"}]
-    [:img#clear.button {:src "img/eraseall.png" :alt "Erase All"}]]
+    [:img#pencil-selected.button {:src "/img/drawOrange.png" :alt "Currently in sketch mode"}]
+    [:img#eraser.button {:src "/img/eraseOrange.png" :alt "Erase"}]
+    [:img#clear.button {:src "/img/eraseallOrange.png" :alt "Erase All"}]]
    [:div#my-ink]))
+
+(defpage "/ink" []
+  (canvas))
 
 (defpage [:post "/ink/store-data"] {:keys [data]}
   (do
@@ -30,10 +32,28 @@
   (str (db/add-stroke! data)))
 
 (defpage [:post "/ink/remove-stroke"] {:keys [data]}
-  (str (db/rm-stroke! data)))
+  (do
+    (str (db/rm-stroke! data))))
 
 (defpage "/ink/strokes" []
   (json/json-str (vec (db/get-strokes-set))))
 
 (defpage [:post "/ink/clear-strokes"] []
   (str (db/clear-strokes-set)))
+
+;; With individual pages
+
+(defpage "/canvas/:id" {:keys [id]}
+  (canvas))
+
+(defpage "/canvas/strokes/:id" {:keys [id]}
+  (json/json-str (vec (db/get-strokes-set id))))
+
+(defpage [:post "/canvas/add-stroke/:id"] {:keys [id data]}
+  (str (db/add-stroke! id data)))
+
+(defpage [:post "/canvas/remove-stroke/:id"] {:keys [id data]}
+  (str (db/rm-stroke! id data)))
+
+(defpage [:post "/canvas/clear-strokes/:id"] {:keys [id data]}
+  (str (db/clear-strokes-set id)))
