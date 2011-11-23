@@ -8,7 +8,7 @@
 
 (defpage "/" []
   (html
-   (common/build-head [:landing :welcome.js])
+   (common/build-head [:style :jquery :jquery-ui :util.js :landing :welcome.js])
    [:div#wrapper
     [:img#circle.center {:src "/img/landing.png" :alt "circle and logo"}]
     [:div#instructions.center

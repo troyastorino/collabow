@@ -1,6 +1,6 @@
 $(document).ready(function () {
-  $("#start").submit(function(e) {
+  $("#nameyourspace").submit(function(e) {
     e.preventDefault();
-    window.location.href = "canvas/"+$("#space-id").val().toString();
+    window.location.href = "canvas/"+$("#spaceid").val().toString();
   });
 });
