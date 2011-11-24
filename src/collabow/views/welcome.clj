@@ -12,10 +12,10 @@
    [:div#wrapper
     [:img#circle.center {:src "/img/landing.png" :alt "circle and logo"}]
     [:div#instructions.center
-     [:form#nameyourspace.center
-      [:input#spaceid.center {:type "text" :name "spaceid"}]
-      [:input#go.center {:type "image" :src "/img/gobutton.png" :alt "let's go collabow!"}]]
-     [:p#start "Collabow is a real-time remote collaboration platform. This means that you can have a virtual space that you can share with anyone anytime, and you can all work at the same time. To get started, chose a name for your space and enter it here:"]
+     [:p#start "Collabow is a real-time remote collaboration platform. This means you get a virtual space to share with anyone, and you can all work on it at the same time. To get started, choose a name for your space."]
      [:img#pointright {:src "/img/arrowright.png" :alt "pointing right"}]
+     [:form#nameyourspace
+      [:input#spaceid.center {:type "text" :name "spaceid"}]
+      [:input#go.center {:type "image" :src "/img/gobutton.png" :alt "let's go collabow!"}]]     
      [:img#pointleft {:src "/img/arrowleft.png" :alt "pointing left"}]
-     [:p#ready "Now, you can share your space name with anyone you want to Collabow-rate with. Share it with friends, co-workers, or anyone else you want to exchange ideas with. Ready, set, let's go Collabow!"]]]))
+     [:p#ready "Now, share this space with anyone you want to Collabow-rate with. Use it with friends, co-workers, and anyone else you want to exchange ideas with. Give them the name, and you're golden!  Ready, set, Collabow!"]]]))

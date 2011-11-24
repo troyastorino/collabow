@@ -98,16 +98,16 @@ function resizeInkDiv() {
 
 function setSketchMode() {
   $("#my-ink").ink("option", "mode", "write");
-  $("#pencil").replaceWith("<img id='pencil-selected' class='button' src='/img/pencilSELECT.png' alt='Currently in sketch mode' />");
-  $("#eraser-selected").replaceWith("<img id='eraser' class='button' src='/img/eraser.png' alt='Erase' />");
-  $("#eraser").click(setEraseMode);
+//  $("#pencil").replaceWith("<img id='pencil-selected' class='button' src='/img/pencilSELECT.png' alt='Currently in sketch mode' />");
+//  $("#eraser-selected").replaceWith("<img id='eraser' class='button' src='/img/eraser.png' alt='Erase' />");
+//  $("#eraser").click(setEraseMode);
 }
 
 function setEraseMode() {
   $("#my-ink").ink("option", "mode", "erase");
-  $("#pencil-selected").replaceWith("<img id='pencil' class='button' src='/img/pencil.png' alt='Sketch' />");
-  $("#eraser").replaceWith("<img id='eraser-selected'class='button' src='/img/eraserSELECT.png' alt='Currently in erasing mode' />");
-  $("#pencil").click(setSketchMode);
+//  $("#pencil-selected").replaceWith("<img id='pencil' class='button' src='/img/pencil.png' alt='Sketch' />");
+//  $("#eraser").replaceWith("<img id='eraser-selected'class='button' src='/img/eraserSELECT.png' alt='Currently in erasing mode' />");
+//  $("#pencil").click(setSketchMode);
 }
 
 $(document).ready(function() {
@@ -137,6 +137,7 @@ $(document).ready(function() {
   });
 
   $("#eraser").click(setEraseMode);
+  $("#pencil-selected").click(setSketchMode);
 
   //bind window resize to canvas resize
   $(window).resize(function() {

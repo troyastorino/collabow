@@ -42,7 +42,6 @@ p {
     font-size:12px;
     color:#1877A0;
     text-align:left;
-    float:left;
     font-family:Century Gothic, Futura, Tahoma, sans-serif;;
 }
 
@@ -53,6 +52,10 @@ button#erase {
 
 div#wrapper {
     position:relative;
+}
+
+#version {
+    margin:5px 20px;
 }
 
 
@@ -72,6 +75,10 @@ div#wrapper {
 .button {
 	height:60px;
 	margin-right:20px;
+}
+
+.button:hover {
+    cursor:pointer;
 }
 
 .footerDeco {

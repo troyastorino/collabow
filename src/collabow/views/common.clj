@@ -16,7 +16,7 @@
 (defhtml build-head [incls]
             [:head
              [:title "collabow"]
-             [:link {:rel "icon" :href "/img/favicon.ico"}]
+             [:link {:rel "icon" :href "/img/faviconBlue.ico"}]
              (map #(get includes %) incls)])
 
 (defhtml header []
@@ -25,7 +25,7 @@
    [:h3#tagline "brainstorm real-time with anyone anywhere."]])
 
 (defhtml footer []
-  [:footer [:p "&#8226;&#8226;&#8226; Version 0.0.1alpha3 MADesigns &#8226;&#8226;&#8226"]])
+  [:footer [:p#version "&#8226;&#8226;&#8226; Version 0.0.1alpha3 MADesigns &#8226;&#8226;&#8226"]])
 
 (defhtml includes-layout [includes & content]
             (html5
