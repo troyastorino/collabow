@@ -1,3 +1,9 @@
+div#wrapper
+{
+    margin:0px auto 0px auto;
+    display:inline-block;
+}
+
 div#my-ink
 {
     border:4px solid #F4B038;
@@ -12,6 +18,7 @@ div#tools {
 
 body {
     margin: 0px;
+    text-align:center;
 }
 
 h1 {
