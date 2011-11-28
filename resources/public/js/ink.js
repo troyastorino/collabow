@@ -96,18 +96,27 @@ function resizeInkDiv() {
   $("#my-ink").width(x+"px");
 }
 
-function setSketchMode() {
+function setSketchMode () {
   $("#my-ink").ink("option", "mode", "write");
-//  $("#pencil").replaceWith("<img id='pencil-selected' class='button' src='/img/pencilSELECT.png' alt='Currently in sketch mode' />");
-//  $("#eraser-selected").replaceWith("<img id='eraser' class='button' src='/img/eraser.png' alt='Erase' />");
-//  $("#eraser").click(setEraseMode);
+  $("#draw").addClass("hidden");
+  $("#draw-selected").removeClass("hidden");
+  $("#erase").removeClass("hidden");
+  $("#erase-selected").addClass("hidden");
 }
 
 function setEraseMode() {
   $("#my-ink").ink("option", "mode", "erase");
-//  $("#pencil-selected").replaceWith("<img id='pencil' class='button' src='/img/pencil.png' alt='Sketch' />");
-//  $("#eraser").replaceWith("<img id='eraser-selected'class='button' src='/img/eraserSELECT.png' alt='Currently in erasing mode' />");
-//  $("#pencil").click(setSketchMode);
+  $("#draw").removeClass("hidden");
+  $("#draw-selected").addClass("hidden");
+  $("#erase").addClass("hidden");
+  $("#erase-selected").removeClass("hidden");
+}
+
+function clickClearAll() {
+  $("#my-ink").ink("clear", true);
+  clearStrokes();
+  $("#clear").removeClass("hidden");
+  $("#clear-selected").addClass("hidden");
 }
 
 $(document).ready(function() {
@@ -131,13 +140,15 @@ $(document).ready(function() {
   }, 10);
 
   //bind handlers to tool buttons
-  $("#clear").click(function() {
-    $("#my-ink").ink("clear", true);
-    clearStrokes();
-  });
-
-  $("#eraser").click(setEraseMode);
-  $("#pencil-selected").click(setSketchMode);
+  $("#clear").click(clickClearAll);
+  //  $("#clear").mousedown(function() {
+  //    $("#clear").addClass("hidden");
+  //    $("#clear-selected").removeClass("hidden");
+  //  });
+  //  $("#clear-selected").mouseup(clickClearAll);
+  $("#erase").click(setEraseMode);
+  $("#draw").click(setSketchMode);
+  
 
   //bind window resize to canvas resize
   $(window).resize(function() {

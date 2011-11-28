@@ -11,9 +11,12 @@
   (common/includes-layout   [:jquery-ink :ink.js]
    [:img#arrow {:src "/img/arrowBlue.png" :alt "Start sketching!"}]
    [:div#tools
-    [:img#pencil-selected.button {:src "/img/drawOrange.png" :alt "Currently in sketch mode"}]
-    [:img#eraser.button {:src "/img/eraseOrange.png" :alt "Erase"}]
-    [:img#clear.button {:src "/img/eraseallOrange.png" :alt "Erase All"}]]
+    [:img#draw-selected.button {:src "/img/drawBlue.png" :alt "Currently in sketch mode"}]
+    [:img#draw.button.hidden {:src "/img/drawOrange.png" :alt "Draw"}]
+    [:img#erase.button {:src "/img/eraseOrange.png" :alt "Erase"}]
+    [:img#erase-selected.button.hidden {:src "/img/eraseBlue.png" :alt "Currently in erase mode"}]
+    [:img#clear.button {:src "/img/eraseallOrange.png" :alt "Erase All"}]
+    [:img#clear-selected.button.hidden {:src "/img/eraseallBlue.png" :alt "Erase All selected"}]]
    [:div#my-ink]))
 
 (defpage "/ink" []

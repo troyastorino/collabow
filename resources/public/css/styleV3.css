@@ -52,11 +52,6 @@ p {
     font-family:Century Gothic, Futura, Tahoma, sans-serif;;
 }
 
-button#erase {
-    float:right;
-    margin-right:15px;
-}
-
 div#wrapper {
     position:relative;
 }
@@ -82,6 +77,10 @@ div#wrapper {
 .button {
 	height:60px;
 	margin-right:20px;
+}
+
+.hidden {
+    display: none;
 }
 
 .button:hover {
