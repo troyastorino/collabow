@@ -6,6 +6,7 @@
 (def includes {:jquery (include-js "https://ajax.googleapis.com/ajax/libs/jquery/1.6.4/jquery.min.js")
                :jquery-ui (include-js "https://ajax.googleapis.com/ajax/libs/jqueryui/1.8.16/jquery-ui.min.js")
                :jquery-ink (include-js "/lib/jquery-ink.js")
+               :detect (include-js "/lib/detectmobilebrowser.js")
                :reset (include-css "/css/reset.css")
                :style (include-css "/css/styleV3.css")
                :landing (include-css "/css/styleLanding.css")
@@ -21,7 +22,7 @@
 
 (defhtml header []
   [:header
-   [:h1 [:img#logo {:src "/img/logo4.png" :alt "logo"}]]
+   [:h1 [:a {:href "/"} [:img#logo {:src "/img/logo4.png" :alt "logo"}]]]
    [:h3#tagline "brainstorm real-time with anyone anywhere."]])
 
 (defhtml footer []
@@ -29,7 +30,7 @@
 
 (defhtml includes-layout [includes & content]
             (html5
-              (build-head  (into [:style :jquery :jquery-ui :util.js] includes))
+              (build-head  (into [:style :jquery :jquery-ui :detect :util.js] includes))
               [:body
                (header)
                [:div#wrapper

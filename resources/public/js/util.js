@@ -15,3 +15,14 @@ function insertPath(url, path) {
   array.push(last);
   return array.reduce(function(prev, cur) { return prev + "/" + cur });
 }
+
+//assumes arrays are identical, except the smaller array is missing
+//one element.  returns the missing element
+function diff(smallerArray, largerArray) {
+  for (i=0; i < largerArray.length; i++) {
+    if (smallerArray[i] != largerArray[i]) {
+      return largerArray[i];
+    }
+  }
+}
+

@@ -53,7 +53,9 @@
   (json/json-str (vec (db/get-strokes-set id))))
 
 (defpage [:post "/canvas/add-stroke/:id"] {:keys [id data]}
-  (str (db/add-stroke! id data)))
+  (let [ret (str (db/add-stroke! id data))]
+    (println "id: " id " data: " data " ret: " ret)
+    ret))
 
 (defpage [:post "/canvas/remove-stroke/:id"] {:keys [id data]}
   (str (db/rm-stroke! id data)))
