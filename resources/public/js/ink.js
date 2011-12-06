@@ -1,12 +1,13 @@
-if ($.browser.mobile) {
-  $.getScript("http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js");
-}
-
 // If the user is drawing a stroke, stops reloads of canvas
 var stopReloads = false;
 var strokes = [];
-var url;
-var refresh;
+var url = getURL();
+var refresh = true;
+var touchDevice = false;
+
+if ($.browser.mobile || navigator.userAgent.match(/iPad/i) != null) {
+  touchDevice = true;
+}
 
 function splitStrokes(serializedStrokes) {
   pattern = /\([^\(\)]+\)/g;
@@ -127,9 +128,7 @@ function setRefresh(millis) {
   }, millis);
 }
 
-function initialize() {
-  url = getURL();
-
+function initialize(millis) {
   resizeInkDiv();
 
   //create the ink widget
@@ -145,12 +144,35 @@ function initialize() {
     resizeInkDiv();
     $("#my-ink").ink("resize", true);
   });
+
+  setRefresh(millis);
 }
 
-if ($.browser.mobile) {
+if (!touchDevice) {
+  $(document).ready(function() {
+    initialize(100);
+    
+    //bind handlers to tool buttons
+    $("#clear").click(clickClearAll);
+    $("#erase").click(setEraseMode);
+    $("#draw").click(setSketchMode);
+
+    //stop reloading while drawing
+    $("#my-ink canvas").mousedown(function() {
+      stopReloads = true;
+    });
+  });
+} else {
+  $(document).bind("mobileinit", function() {
+    $.extend($.mobile, {
+      loadingMessage: false
+    });
+  });
+  
+  $.getScript("http://code.jquery.com/mobile/1.0/jquery.mobile-1.0.min.js");
+  
   $("[data-role=page]").live("pageinit", function(event) {
-    initialize();
-    setRefresh(1000);
+    initialize(1000);
     
     //bind handlers to tool buttons
     $("#clear").tap(clickClearAll);
@@ -165,22 +187,6 @@ if ($.browser.mobile) {
     //set refresh rate on page refocus
     window.onload(function() {
       setRefresh(1000);
-    })
-    
-  });
-} else {
-  $(document).ready(function() {
-    initialize();
-    setRefresh(10);
-    
-    //bind handlers to tool buttons
-    $("#clear").click(clickClearAll);
-    $("#erase").click(setEraseMode);
-    $("#draw").click(setSketchMode);
-
-    //stop reloading while drawing
-    $("#my-ink canvas").mousedown(function() {
-      stopReloads = true
     });
   });
 }
