@@ -50,3 +50,7 @@ var Rectangle = Entity.extend({
       return "A Rectangle must have a width and height"
   }
 });
+
+var PointCollection = Backbone.Collection.Extend({
+  model: Point
+});
