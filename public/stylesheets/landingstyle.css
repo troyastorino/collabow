@@ -1,8 +1,12 @@
 /* general */
 
+body * {
+    vertical-align: top;
+}
+
 body {
     font-family:Century Gothic, Futura, Tohoma, sans-serif;
-    color:#2F7EA5;
+    color:#5E4045;
 }
 
 .center {
@@ -27,7 +31,6 @@ h3 {
 }
 
 p {
-    color:#5E4045;
     padding:0px;
     font-family:Century Gothic, Futura, Tahoma, sans-serif;;
     font-weight:normal;
@@ -36,32 +39,32 @@ p {
 /* sign in */
 
 #signin {
-	  height: 20px;
+    height: 20px;
 }
 
 /* big circle display */
 
 #circledisplay {
-	  height: 400px;
-	  margin-bottom: 20px;
+    height: 400px;
+    margin-bottom: 20px;
 }
 
 #circle {
-	  height: 400px;
-	  display: block;
+    height: 400px;
+    display: block;
 }
 
 #logo {
-	  height: 100px;
-	  display:block;
-	  position: relative;
-	  bottom: 275px;
+    height: 100px;
+    display:block;
+    position: relative;
+    bottom: 275px;
 }
 
 #tagline {
-	  text-align: center;
-	  position: relative;
-	  bottom: 275px;
+    text-align: center;
+    position: relative;
+    bottom: 275px;
 }
 
 /* email submit area */
@@ -71,57 +74,69 @@ p {
 }
 
 #email_input {
-	  text-align: center;
-	  margin: 10px;
+    text-align: center;
+    margin: 10px;
+    vertical-align: top;
 }
 
-#textbox {
-	  margin-left: 10px;
-	  width:250px;
-    height:30px;
-    font-family:Century Gothic;
+form input {
     font-size:14px;
     text-align:center;
     border-radius: 5px; 
-	  -moz-border-radius: 5px; 
-	  -webkit-border-radius: 5px; 
-	  border: 3px solid #2F7EA5;
+    -moz-border-radius: 5px; 
+    -webkit-border-radius: 5px; 
+    border: 3px solid #2F7EA5;
+}
+
+form input[type="image"] {
+    border: none;
+}
+
+#textbox {
+    margin-left: 10px;
+    width:250px;
+    height:30px;
 }
 
 #goArrow {
-	  vertical-align: bottom;
-	  margin-right: 10px;
-	  margin-bottom: 3px;
-}
-
-#emailright {
-}
-
-/* info area */
-
-#info {
-	  width: 850px;
-	  display: block;
-}
-
-.info {
-	  display: inline-block;
-	  width: 400px;
-    vertical-allign: top;
-}
-
-#info_left {
-	  text-align: right;
-	  margin: 10px 10px 10px auto;
-    padding-left: 13px;
-}
-
-#info_right {
-	  margin: 10px auto 10px 10px;
-    vertical-align: top;
+    margin-right: 10px;
+    margin-top: 7px;
 }
 
 #prompt {
     text-align: center;
     font-size: 14pt;
+}
+
+form input.error {
+    border-color: #9E0B0B;
+}
+
+.error-msg {
+    color: #9E0B0B;
+    font-size:10px;
+}
+
+/* info area */
+
+#info {
+    width: 850px;
+    display: block;
+}
+
+.info {
+    display: inline-block;
+    width: 400px;
+    vertical-allign: top;
+}
+
+#info_left {
+    text-align: right;
+    margin: 10px 10px 10px auto;
+    padding-left: 13px;
+}
+
+#info_right {
+    margin: 10px auto 10px 10px;
+    vertical-align: top;
 }
