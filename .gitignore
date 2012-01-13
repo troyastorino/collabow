@@ -1,8 +1,1 @@
-pom.xml
-*jar
-/lib/
-/classes/
-.lein-deps-sum
-/misc/
-\#*#
-\#*
+node_modules
