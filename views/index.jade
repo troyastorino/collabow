@@ -1,18 +1,6 @@
-#circledisplay
-  img#circle.center(src="/images/circle.png", alt="circle enclosing logo")
-  img#logo.center(src="/images/logo.png", alt="collabow logo")
-  h3#tagline Brainstorm real-time <br /> with anyone anywhere.
-#prompt
-  form#email_input(method="post", action="/email")
-    h3#emailleft.center Want to learn more?
-    #textinput.center
-      input#textbox.center(type="text", name="email", placeholder="Your email")
-    input#goArrow.center(type="image", src="images/goArrow.png", alt="submit form")
-    h3#emailright.center We'll keep you posted!
-#info.center
-  #info_left.info.center
-    h3 Who we are:
-    p Hello world! <br /> We are a team of MIT engineers working to change the experience of sharing ideas online. We hope you like Collabow as much as we do! Give us feedback at founders@collabow.com.
-  #info_right.info.center
-    h3 What we do:
-    p We are your never-ending virtual whiteboard. <br /> Collabow brings you all the tools you've come to expect for online collaboration, and gives you access to the true language of brainstorming: sketching!
+div
+  a(id='sender')='Send a Message'
+  ul(id='reciever')
+
+script(defer, src='/js/script.js')
+script(defer, src='/socket.io/socket.io.js')
