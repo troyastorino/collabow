@@ -48,8 +48,8 @@ server.listen( port);
 var io = io.listen(server);
 
 io.sockets.on('connection', function(socket) {
-  socket.on('addStroke', function(stroke) {
-    socket.broadcast.emit('addStroke', stroke);
+  socket.on('addPoint', function(point) {
+    socket.broadcast.emit('addPoint', point);
   });
 });
 
