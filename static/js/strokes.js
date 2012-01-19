@@ -13,7 +13,7 @@ var Stroke = Backbone.Model.extend({
   initialize: function() {
     this.points = new PointCollection;
     this.add = this.points.add;
-  },
+  }
 });
 
 var StrokeCollection = Backbone.Collection.extend({

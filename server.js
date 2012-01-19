@@ -8,13 +8,6 @@ var connect = require('connect')
     , mongo = require('./db/mongo.js')
     , user = require("./routes/user.js")
     , RedisStore = require('connect-redis')(express);
-   /* , browserify = require('browserify')
-    , bundle = browserify().require(
-        ['underscore',
-         'backbone',
-         __dirname + '/models/strokes.js',
-         __dirname + '/views/canvas.js'
-         ])*/;
 
 //Setup Express
 var server = express.createServer();
@@ -29,7 +22,6 @@ server.configure(function(){
         maxAge: 100*24*60*60*1000
       }
     }));
-//    server.use(bundle);
     server.use(connect.static(__dirname + '/static'));
     server.use(server.router);
 });
