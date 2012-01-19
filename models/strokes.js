@@ -1,10 +1,10 @@
-var underscore = require('underscore')._,
-    backbone = require('backbone');
+var _ = require('underscore'),
+    Backbone = require('backbone');
 
 var Point = exports.Point = backbone.Model.extend({});
 
 var PointCollection = exports.PointCollection = backbone.Collection.extend({
-  model: Point;
+  model: Point
 });
 
 var Stroke = exports.Stroke = backbone.Model.extend({
@@ -16,8 +16,6 @@ var Stroke = exports.Stroke = backbone.Model.extend({
   initialize: function() {
     this.points = new PointCollection;
   },
-
-  addPoint: this.points.add,
 });
 
 var StrokeCollection = exports.StrokeCollection = backbone.Collection.extend({

@@ -1,0 +1,14 @@
+form(method='post', action='/signup')
+  label username:
+    input(type='text', name='username')
+  label password:
+    input(type='password', name='password')
+  label confirm password:
+    input(type='password')
+  label name:
+    input(type='text', name='name')
+  label email:
+    input(type='text', name='email')
+  input(type='submit')
+script(defer, src='/js/serializeForm.js')
+script(defer, src='js/views/signup.js')

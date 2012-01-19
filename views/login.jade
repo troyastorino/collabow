@@ -1,0 +1,8 @@
+form(method='post', action='/login')
+  label login:
+    input(type='text', name='login', placeholder='username or email')
+  label password:
+    input(type='password', name='password')
+  input(type='submit')
+script(defer, src='/js/serializeForm.js')
+script(defer, src='/js/views/login.js')

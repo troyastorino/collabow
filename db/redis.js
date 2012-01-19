@@ -1,0 +1,1 @@
+var redis = exports.redis = require("redis");

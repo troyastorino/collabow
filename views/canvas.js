@@ -1,8 +1,8 @@
-var underscore = require('underscore')._ ,
-    backbone = require('backbone'),
-    strokes = require('../models/strokes');
+var _ = require('underscore'),
+    Backbone = require('backbone'),
+    strokes = require('./../collabow/models/strokes.js');
 
-var CanvasView = backbone.View.extend({
+var CanvasView = Backbone.View.extend({
   drawStroke: function(stroke) {
     this.context.beginPath();
 

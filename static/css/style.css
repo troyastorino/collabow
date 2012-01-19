@@ -206,9 +206,11 @@ td { vertical-align: top; }
    Author:
    ========================================================================== */
 
-body { background-color: #000000}
+body { background-color: grey }
 
-canvas { background-color: #FFFFFF}
+p { margin: 0 auto 0 auto; text-allign: center } 
+
+canvas { background-color: #FFFFFF; margin: 20px 20px 20px 20px }
 
 
 

@@ -1,15 +1,4 @@
-// js/strokes.js
-// Models and Collections
-// Dependencies: backbone.js, underscore.js
-
-var Point = Backbone.Model.extend({
-  /* Do we even want these?
-  defaults: {
-    x: undefined
-    y: undefined
-  }
-  */
-});
+var Point = Backbone.Model.extend({});
 
 var PointCollection = Backbone.Collection.extend({
   model: Point

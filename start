@@ -1,0 +1,5 @@
+#!/bin/bash
+
+browserify views/canvas.js -v -o static/js/browserify.js
+
+node server.js
