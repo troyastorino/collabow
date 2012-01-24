@@ -76,6 +76,12 @@ server.get('/', function(req,res){
   });
 });
 
+server.get('/canvas', function(req, res) {
+  res.render('canvas.jade', {
+    locals: locals
+  });
+});
+
 server.get('/signup', user.signup);
 
 server.post('/signup', user.createUser(mongo));

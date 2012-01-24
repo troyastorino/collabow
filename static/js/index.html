@@ -1,0 +1,41 @@
+<html>
+  <head>
+    <script src="lib/jquery.js"></script>
+    <script src="lib/underscore.js"></script>
+    <script src="lib/backbone.js"></script>
+    <script src="lib/raphael.js"></script>
+    <script src="models.js"></script>
+    <script src="views.js"></script>
+    <script src="app.js"></script>
+    <style type="text/css">
+      body {
+        background-color: #888;
+      }
+
+      svg {
+        background-color: #fff;
+      }
+
+      .dragging {
+        fill: #2a5;
+      }
+
+      #tools, svg {
+        display: inline-block;
+      }
+
+      #tools>* {
+        display: block;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="paper">
+      <div id="tools">
+        <button id="addRect">Add Rectangle</button>
+        <button id="drawMode">Draw Mode</button>
+        <button id="eraseMode">Erase Mode</button>
+      </div>
+    </div>
+  </body>
+</html>

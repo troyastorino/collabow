@@ -1,6 +1,6 @@
 var _ = require('underscore'),
-Backbone = require('backbone'),
-strokes = require('./../collabow/models/strokes.js');
+    Backbone = require('backbone'),
+    strokes = require('./../collabow/models/strokes.js');
 
 var CanvasView = exports.CanvasView = Backbone.View.extend({
   tagName: "canvas",

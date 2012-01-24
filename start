@@ -1,5 +1,5 @@
 #!/bin/bash
 
-browserify statis/js/views/canvas.js -v -o static/js/browserify.js
+browserify static/js/views/canvas.js -v -o static/js/browserify.js
 
 node server.js

@@ -1,4 +1,4 @@
-var CanvasView = require("./../collabow/views/canvas.js");
+var CanvasView = require("./../views/canvas.js");
 
 $(document).ready(function(){
   window.canvasView = new CanvasView;
