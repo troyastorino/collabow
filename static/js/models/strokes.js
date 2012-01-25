@@ -16,7 +16,6 @@ var Stroke = exports.Stroke = Backbone.Model.extend({
 
   initialize: function() {
     this.set({id: uuid.v4()});
-    // this.add = this.points.add;
   }
 });
 
@@ -26,8 +25,6 @@ var StrokeCollection = exports.StrokeCollection = Backbone.Collection.extend({
 
 var Rectangle = exports.Rectangle = Backbone.Model.extend({
   defaults: {
-    x: undefined,
-    y: undefined,
     width: 100,
     height: 70
   }

@@ -2060,7 +2060,7 @@
             };
             R["un" + eventName] = elproto["un" + eventName] = function (fn) {
                 var events = this.events,
-                    l = events.length;
+                    l = events ? events.length : 0;
                 while (l--) if (events[l].name == eventName && events[l].f == fn) {
                     events[l].unbind();
                     events.splice(l, 1);

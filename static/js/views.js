@@ -1,3 +1,46 @@
+var utils = {
+  elementDragStart: function() {
+    this.ox = this.model.get("x");
+    this.oy = this.model.get("y");
+    this.element.toFront();
+  },
+
+  elementDragFinish: function() {
+
+  },
+  
+  elementDragMove: function(dx, dy) {
+    this.model.set({
+      x: this.ox + dx,
+      y: this.oy + dy
+    });
+  },
+
+  makeDraggable: function(element) {
+    // if has length, it is a set
+    if (element.length) {
+
+    } else {
+      element.drag(utils.elementDragMove, utils.elementDragStart, utils.elementDragFinish,
+                      element.view, element.view, element.view);
+    return element;
+    }
+  },
+
+  makeUndraggable: function(element) {
+    element.undrag();
+
+    return element;
+  },
+  
+  setDragStart: function(x, y, event) {
+    this.forEach(function(element) {
+      element.ox;
+      element.oy = y;
+    });
+  },  
+};
+
 var ElementView  = Backbone.View.extend({
   initialize: function() {
     // create reference to Raphael object in addition to DOM element
@@ -9,52 +52,39 @@ var ElementView  = Backbone.View.extend({
     this.model.bind("change", this.render, this);
     this.model.bind("destroy", this.remove, this);
 
-    // enable dragging
-    this.element.drag(this.dragMove, this.dragStart,
-                     this.dragFinish, this, this, this);
-
-    // set glow on mouseover
-    /*this.element.hover(function() {
-        this.g = this.glow({
-          color: "#4D90FE",
-          width: 5
-        });
-      }, function() {
-        this.g.remove();
-      }
-    )*/
-
+    // add events in child
+    if (this.events) {
+      this.events = _.defaults(this.events, ElementView.prototype.events);
+    }
+    
     // delegate events and render
     if (this.events) this.delegateEvents(this.events);
     this.render();
+  },
+
+  downHandler: function() {
+    switch (window.state.mode) {
+    case window.modes.SELECT:
+      this.model.set({
+        selected: !this.model.get("selected"),
+      });
+    }
   },
 
   destroyModel: function() {
     this.model.destroy();
   },
 
-  dragStart: function() {
-    this.ox = this.model.get("x");
-    this.oy = this.model.get("y");
-    this.element.toFront();
-  },
-
-  dragFinish: function() {
-
-  },
-  
-  dragMove: function(dx, dy) {
-    var newPose = {
-      x: this.ox + dx,
-      y: this.oy + dy
-    }
-    this.model.set(newPose);
-/*    // if a glow element exists also move the glow element
-    if (this.g) this.g.attr(newPose);*/
+  events: {
+    "click": "downHandler",
   },
 
   remove: function() {
     this.element.remove();
+  },
+
+  render: function() {
+
   }
 });
 
@@ -77,12 +107,30 @@ var StrokeView = ElementView.extend({
       "stroke-linecap": this.model.get("stroke-linecap"),
       "stroke-linejoin": this.model.get("stroke-linejoin")
     });
+
+    // add glow for selection
+    if (this.model.get("selected")) {
+      if (!this.glow) this.glow = this.element.glow({
+        color: "#4D90FE",
+        width: 8
+      });
+      this.glow.attr({
+        path: this.model.get("path"),
+      });
+    } else {
+      if (this.glow) {
+        this.glow.remove();
+        this.glow = null;
+      }
+    }
+    
     return this;
   }
 });
 
 var RectView = ElementView.extend({
   render: function() {
+    // draw rectangle
     this.element.attr({
       x: this.model.get("x"),
       y: this.model.get("y"),
@@ -92,9 +140,35 @@ var RectView = ElementView.extend({
       width: this.model.get("width"),
       height: this.model.get("height")
     });
+
+    // add glow for selection
+    if (this.model.get("selected")) {
+      if (!this.glow) this.glow = this.element.glow({
+        color: "#4D90FE",
+        width: 10
+      });
+      var path = [
+        ["M", this.model.get("x"), this.model.get("y")],
+        ["l", this.model.get("width"), 0],
+        ["l", 0, this.model.get("height")],
+        ["l", -(this.model.get("width")), 0],
+        ["z"]
+      ];
+      this.glow.forEach(function(element) {
+        element.attr({
+          path: path
+        })
+      });
+    } else {
+      if (this.glow)  {
+        this.glow.remove();
+        this.glow = null;
+      }
+    }
+    
     return this;
   }
-})
+});
 
 var AppView = Backbone.View.extend({
   addRect: function() {
@@ -109,13 +183,31 @@ var AppView = Backbone.View.extend({
     this.currentStroke.addPoint(e.offsetX, e.offsetY);
   },
 
+  clearCurrentMode: function() {
+    switch(window.state.mode){
+    case window.modes.DRAW:
+
+      break;
+    case window.modes.SELECT:
+      this.paper.forEach(function(element) {
+        utils.makeUndraggable(element);
+      });
+      window.state.currentSelection.clear();
+      break;
+    case window.modes.ERASE:
+
+      break;
+    case window.modes.TEXT:
+
+      break;
+    }
+  },
+
   downHandler: function(e) {
     window.state.mousedown = true;
     switch (window.state.mode) {
     case window.modes.DRAW:
-      if (e.target.nodeName === this.paperName) {
-        this.startStroke(e); 
-      }
+      this.startStroke(e); 
       break;
     case window.modes.ERASE:
 
@@ -130,6 +222,7 @@ var AppView = Backbone.View.extend({
     "click #addRect": "addRect",
     "click #drawMode": "setDrawMode",
     "click #eraseMode": "setEraseMode",
+    "click #selectMode": "setSelectMode",
     "mousedown" : "downHandler",
     "mousemove" : "moveHandler",
     "mouseup" : "upHandler"
@@ -143,11 +236,14 @@ var AppView = Backbone.View.extend({
     window.modes = {
         ERASE: "erase",
         DRAW: "draw",
+        SELECT: "select",
+        TEXT: "text"
     };
     
     window.state = {
       mode: window.modes.DRAW,
       mousedown: false,
+      currentSelection: this.paper.set(),
     };
   },
 
@@ -169,17 +265,29 @@ var AppView = Backbone.View.extend({
   paperName: "svg",
 
   setDrawMode: function() {
+    this.clearCurrentMode();
     window.state.mode = window.modes.DRAW;
   },
 
   setEraseMode: function() {
+    this.clearCurrentMode();
     window.state.mode = window.modes.ERASE;
+  },
+
+  setSelectMode: function() {
+    this.clearCurrentMode();
+
+    this.paper.forEach(function(element) {
+      utils.makeDraggable(element);
+    });
+
+    window.state.mode = window.modes.SELECT;
   },
 
   startStroke: function(e) {
     var view = new StrokeView({
       element: this.paper.path(),
-      model: new Stroke
+      model: new Stroke,
     });
     this.currentStroke = view.model;
     this.addPoint(e);

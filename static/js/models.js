@@ -1,45 +1,43 @@
+var Element = Backbone.Model.extend({
+  initialize: function() {
+    if (this.defaults) {
+      this.defaults = _.defaults(this.defaults, Element.prototype.defaults);
+    }
+  },
+
+  defaults: {
+    selected: false,
+  }
+});
+
 var Stroke = Backbone.Model.extend({
   addPoint: function(x, y) {
-    // relDists is an array of vectors pointing from the previous
-    // point.
-    var relDists;
-    if (relDists = this.get("relDists")) {
-      // push relative distance to relDists
-      relDists.push([x - this.get("prevx"), y - this.get("prevy")]);
+    if (this.get("path")) {
+      this.get("path").push(["l", x - this.get("prevx"), y - this.get("prevy")]);
 
-      // setting the prev point will also trigger the change event
+      // setting these triggers the change event so the render
+      // function will fire
       this.set({
         prevx: x,
         prevy: y
       });
     } else {
       this.set({
+        path: [["M", x, y]],
         x: x,
         y: y,
-        // keep reference to "previous point" to calculate relative
-        // distances
         prevx: x,
-        prevy: y,
-        relDists: []
+        prevy: y
       });
-    }
+    }    
   },
   
   defaults: {
     stroke: "#000",
     "stroke-width": 5,
     "stroke-linecap": "round",
-    "stroke-linejoin": "round"
-  },
-
-  get: function(attr) {
-    // if attribute exists as a function in the model
-    if (typeof this[attr] == 'function') {
-      return this[attr]();
-    }
-
-    // default to normal get
-    return Backbone.Model.prototype.get.call(this, attr);
+    "stroke-linejoin": "round",
+    
   },
 
   initialize: function() {
@@ -48,17 +46,13 @@ var Stroke = Backbone.Model.extend({
     });*/
   },
 
-  path: function() {
-    var path = "", relDists;
-    if (relDists = this.get("relDists")) {
-      path +=  "M" + this.get("x") + "," + this.get("y");
-      for (var i = 0, ii = relDists.length; i < ii; i +=1) {
-        var point = relDists[i];
-        path += "l" + point[0] + "," + point[1];
-      }
-    }
-    return path;
-  },
+  set: function(attributes, options) {
+    // if updating x and y, make sure to update path
+    if (attributes.x && attributes.y && this.get("path"))
+      this.get("path")[0] = ["M", attributes.x, attributes.y];
+
+    Backbone.Model.prototype.set.call(this, attributes, options);
+  }
 });
 
 var Rect = Backbone.Model.extend({
@@ -72,3 +66,7 @@ var Rect = Backbone.Model.extend({
     fill: "#eee",
   }
 });
+
+var Action = Backbone.Model.extend({
+  
+})
