@@ -38,7 +38,7 @@ var Stroke = Backbone.Model.extend({
   
   defaults: {
     stroke: "#000",
-    "stroke-width": 5,
+    "stroke-width": 3,
     "stroke-linecap": "round",
     "stroke-linejoin": "round",
   },
@@ -66,8 +66,8 @@ var Rect = Backbone.Model.extend({
     width: 100,
     height: 70,
     stroke: "#000",
-    "stroke-width": 2,
-    fill: "#29e",
+    "stroke-width": 1,
+    fill: "#eee",
   }
 });
 
