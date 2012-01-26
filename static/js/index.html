@@ -7,38 +7,38 @@
     <script src="models.js"></script>
     <script src="views.js"></script>
     <script src="app.js"></script>
-    <style type="text/css">
-      body {
-        background-color: #888;
-      }
-
-      svg {
-        background-color: #fff;
-      }
-
-      .dragging {
-        fill: #2a5;
-      }
-
-      #tools, svg {
-        display: inline-block;
-      }
-
-      #tools>* {
-        display: block;
-      }
-    </style>
+    <link rel="stylesheet" type="text/css" href="style.css" />
   </head>
+  
   <body>
+  
+  	<div id="top">
+  		<img id="logo" src="img/collabow.png" alt="collabow logo with bowtie!">
+  		<h3 id="tagline">Brainstorm real-time <br> with anyone anywhere</h3>
+  	</div>
+  	
+  
     <div id="paper">
       <div id="tools">
+      	<input id="drawMode" type="image" src="img/draw.png" alt="draw mode">
+      	<input id="eraseMode" type="image" src="img/erase.png" alt="draw mode">
+      	<input id="selectMode" type="image" src="img/select.png" alt="draw mode">
+      	<input id="addRect" type="image" src="img/rect.png" alt="draw mode">
+      	<input id="textMode" type="image" src="img/text.png" alt="draw mode">
+      	<input id="delete" type="image" src="img/delete.png" alt="draw mode">
+        
+<!--        
         <button id="addRect">Add Rectangle</button>
         <button id="drawMode">Draw Mode</button>
         <button id="selectMode">Select Mode</button>
         <button id="eraseMode">Erase Mode</button>
         <button id="delete">Delete</button>
         <button id="textMode">Create textbox</button>
+--!>        
+        
       </div>
     </div>
+    
   </body>
+  
 </html>

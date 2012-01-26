@@ -1,0 +1,66 @@
+h3 {
+    color:#2F7EA5;
+    padding:5px;
+    font-size: 15px;
+    font-family:Century Gothic, Futura, Tahoma, sans-serif;;
+    font-weight:normal;
+    }
+    
+p {
+    color:#5E4045;
+    padding:0px;
+    font-family:Century Gothic, Futura, Tahoma, sans-serif;;
+    font-weight:normal;
+	}
+	
+#top {
+	height: 55px;
+	}
+	
+#tagline {
+	float:left;
+	position:relative;
+	bottom:5px;
+	}
+
+#logo {
+	height: 50px;
+	float: left;
+	}
+
+
+body {
+	background-image:url('img/texture.jpg');
+    }
+    
+#paper {
+	border:5px solid #5E4045;
+	}
+
+svg {
+	background-color: #fff;
+    }
+
+.dragging {
+    fill: #2a5;
+    }
+
+svg {
+    display: inline-block;
+    }
+    
+#tools {
+    display: inline-block;
+    width: 45%;
+    position: absolute;
+    top: 25px;
+    right: 20px;
+    }
+
+#tools>* {
+    display: block;
+    float: right;
+    height:35px;
+    margin: 0px 5px;
+    }
+    
