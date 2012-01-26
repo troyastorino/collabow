@@ -1,47 +1,58 @@
 var utils = {
-  elementDragStart: function() {
-    this.ox = this.model.get("x");
-    this.oy = this.model.get("y");
-    this.element.toFront();
+  makeSetDraggable: function(set) {
+    set.drag(utils.setDragMove, utils.setDragStart, utils.setDragFinish, set, set, set);
+    return set
   },
 
-  elementDragFinish: function() {
-
-  },
-  
-  elementDragMove: function(dx, dy) {
-    this.model.set({
-      x: this.ox + dx,
-      y: this.oy + dy
-    });
+  makeSetUndraggable: function(set) {
+    set.undrag();
+    return set;
   },
 
-  makeDraggable: function(element) {
-    // if has length, it is a set
-    if (element.length) {
-
-    } else {
-      element.drag(utils.elementDragMove, utils.elementDragStart, utils.elementDragFinish,
-                      element.view, element.view, element.view);
-    return element;
-    }
-  },
-
-  makeUndraggable: function(element) {
-    element.undrag();
-
-    return element;
-  },
-  
-  setDragStart: function(x, y, event) {
+  setDragStart: function() {
     this.forEach(function(element) {
-      element.ox;
-      element.oy = y;
+      element.ox = element.view.model.get("x");
+      element.oy = element.view.model.get("y");
     });
-  },  
+  },
+
+  setDragFinish: function() {
+    this.forEach(function(element) {
+      element.ox = element.oy = undefined;
+    });
+  },
+
+  setDragMove: function(dx, dy) {
+    this.forEach(function(element) {
+      element.view.model.set({
+        x: element.ox + dx,
+        y: element.oy + dy
+      });
+    });
+  },
 };
 
 var ElementView  = Backbone.View.extend({
+  destroyModel: function() {
+    this.model.destroy();
+  },
+
+  downHandler: function() {
+    this.clickedDown = true;
+    switch(window.state.mode) {
+    case window.modes.SELECT:
+
+      break;
+    }
+  },
+
+  events: {
+//    "keyup": "keyHandler",
+    "mousedown":"downHandler",
+    "mousemove": "moveHandler",
+    "mouseup": "upHandler"
+  },
+
   initialize: function() {
     // create reference to Raphael object in addition to DOM element
     this.element = this.options.element;
@@ -50,36 +61,71 @@ var ElementView  = Backbone.View.extend({
 
     // bind to changes in the model
     this.model.bind("change", this.render, this);
+//    this.model.bind("change", this.save, this);
     this.model.bind("destroy", this.remove, this);
+
+    // initialize reference variables
+    this.clickedDown = false;
+    this.dragging = false;
 
     // add events in child
     if (this.events) {
       this.events = _.defaults(this.events, ElementView.prototype.events);
     }
-    
+        
     // delegate events and render
     if (this.events) this.delegateEvents(this.events);
     this.render();
   },
 
-  downHandler: function() {
-    switch (window.state.mode) {
+/* Keyboard events don't fire on the SVG element...
+  keyHandler: function(event) {
+    switch(window.state.mode) {
     case window.modes.SELECT:
-      this.model.set({
-        selected: !this.model.get("selected"),
-      });
+      // if backspace or delete
+      if (event.which === 8 || event.which === 46) {
+        window.state.currentSelection.forEach(function(element) {
+          element.view.model.destroy();
+        });
+      }
+    }
+  },*/
+  
+  moveHandler: function() {
+    switch(window.state.mode) {
+    case window.modes.SELECT:
+      if (this.clickedDown) {
+        this.dragging = true;
+      }
+      break;
     }
   },
 
-  destroyModel: function() {
-    this.model.destroy();
-  },
+  upHandler: function() {
+    switch(window.state.mode) {
+    case window.modes.SELECT:
+      if (this.clickedDown) {
+        var selected = this.model.get("selected");
+        if (selected) {
+          if (!this.dragging) {
+            this.model.set({selected: false});
+            window.state.currentSelection.exclude(this.element);
+          }
+        } else {
+          this.model.set({selected: true});
+          window.state.currentSelection.push(this.element);
+        }
+      }
 
-  events: {
-    "click": "downHandler",
+      // make global selection draggable
+      utils.makeSetDraggable(window.state.currentSelection);
+
+    }
+    this.clickedDown = this.dragging = false;
   },
 
   remove: function() {
+    if (this.glow) this.glow.remove();
     this.element.remove();
   },
 
@@ -89,11 +135,11 @@ var ElementView  = Backbone.View.extend({
 });
 
 var StrokeView = ElementView.extend({
-  events: {
-    "mousemove": "handleMove"
-  },
+/*  events: {
+    "mousemove": "handleStrokeMove"
+  },*/
 
-  handleMove: function() {
+  handleStrokeMove: function() {
     if (window.state.mode === window.modes.ERASE && window.state.mousedown) {
       this.remove();
     }
@@ -105,7 +151,7 @@ var StrokeView = ElementView.extend({
       stroke: this.model.get("stroke"),
       "stroke-width": this.model.get("stroke-width"),
       "stroke-linecap": this.model.get("stroke-linecap"),
-      "stroke-linejoin": this.model.get("stroke-linejoin")
+      "strokpe-linejoin": this.model.get("stroke-linejoin")
     });
 
     // add glow for selection
@@ -189,8 +235,8 @@ var AppView = Backbone.View.extend({
 
       break;
     case window.modes.SELECT:
-      this.paper.forEach(function(element) {
-        utils.makeUndraggable(element);
+      window.state.currentSelection.forEach(function(element) {
+        element.view.model.set({selected: false});
       });
       window.state.currentSelection.clear();
       break;
@@ -203,13 +249,20 @@ var AppView = Backbone.View.extend({
     }
   },
 
+  delete: function() {
+    window.state.currentSelection.forEach(function(element) {
+      element.view.model.destroy();
+    });
+    window.state.currentSelection.clear();
+  },
+
   downHandler: function(e) {
     window.state.mousedown = true;
     switch (window.state.mode) {
     case window.modes.DRAW:
       this.startStroke(e); 
       break;
-    case window.modes.ERASE:
+    case window.modes.ERASpE:
 
       break;
     }
@@ -220,6 +273,7 @@ var AppView = Backbone.View.extend({
 
   events: {
     "click #addRect": "addRect",
+    "click #delete": "delete",
     "click #drawMode": "setDrawMode",
     "click #eraseMode": "setEraseMode",
     "click #selectMode": "setSelectMode",
@@ -243,7 +297,7 @@ var AppView = Backbone.View.extend({
     window.state = {
       mode: window.modes.DRAW,
       mousedown: false,
-      currentSelection: this.paper.set(),
+      currentSelection: this.paper.set()
     };
   },
 
@@ -277,9 +331,9 @@ var AppView = Backbone.View.extend({
   setSelectMode: function() {
     this.clearCurrentMode();
 
-    this.paper.forEach(function(element) {
+/*    this.paper.forEach(function(element) {
       utils.makeDraggable(element);
-    });
+    });*/
 
     window.state.mode = window.modes.SELECT;
   },

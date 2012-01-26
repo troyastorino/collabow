@@ -63,7 +63,18 @@ var Rect = Backbone.Model.extend({
     height: 70,
     stroke: "#000",
     "stroke-width": 2,
-    fill: "#eee",
+    fill: "#29e",
+  }
+});
+
+var Elements = Backbone.Collection.extend({
+  model: Element,
+});
+
+var Paper = Backbone.Model.extend({
+  defaults: {
+    elements: new Elements,
+    selection: new Elements
   }
 });
 
