@@ -15,30 +15,31 @@ p {
 	
 #top {
 	height: 55px;
+	padding-top:15px;
 	}
 	
 #tagline {
 	float:left;
 	position:relative;
 	bottom:5px;
+	padding-left:10px;
 	}
 
 #logo {
 	height: 50px;
 	float: left;
+	padding-left:10px;
+	padding-bottom:5px;
 	}
 
 
 body {
 	background-image:url('img/texture.jpg');
     }
-    
-#paper {
-	border:5px solid #5E4045;
-	}
 
 svg {
 	background-color: #fff;
+	border:5px solid #5E4045;
     }
 
 .dragging {
@@ -53,8 +54,8 @@ svg {
     display: inline-block;
     width: 45%;
     position: absolute;
-    top: 25px;
-    right: 20px;
+    top: 40px;
+    right: 5px;
     }
 
 #tools>* {
@@ -63,4 +64,27 @@ svg {
     height:35px;
     margin: 0px 5px;
     }
+    
+#nav {
+	position:absolute;
+	top:-13px;
+	right:10px;
+	}
+	
+#nav>* {
+	float:left;
+	
+	}
+    
+#userOptions {
+	height:20px;
+	position:relative;
+	top:20px;
+	}
+	
+#logoutIcon {
+	height:20px;
+	position:relative;
+	top:20px;
+	}
     
