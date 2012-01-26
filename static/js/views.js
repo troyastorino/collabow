@@ -48,9 +48,9 @@ var ElementView  = Backbone.View.extend({
 
   events: {
 //    "keyup": "keyHandler",
-    "mousedown":"downHandler",
-    "mousemove": "moveHandler",
-    "mouseup": "upHandler"
+    "mousedown.element":"downHandler",
+    "mousemove.element": "moveHandler",
+    "mouseup.element": "upHandler"
   },
 
   initialize: function() {
@@ -68,13 +68,8 @@ var ElementView  = Backbone.View.extend({
     this.clickedDown = false;
     this.dragging = false;
 
-    // add events in child
-    if (this.events) {
-      this.events = _.defaults(this.events, ElementView.prototype.events);
-    }
-        
     // delegate events and render
-    if (this.events) this.delegateEvents(this.events);
+    this.delegateEvents();
     this.render();
   },
 
@@ -135,14 +130,18 @@ var ElementView  = Backbone.View.extend({
 });
 
 var StrokeView = ElementView.extend({
-/*  events: {
-    "mousemove": "handleStrokeMove"
-  },*/
-
   handleStrokeMove: function() {
     if (window.state.mode === window.modes.ERASE && window.state.mousedown) {
       this.remove();
     }
+  },
+
+  initialize: function() {
+    this.events = _.extend({}, this.events, {
+      "mousemove.stroke": "handleStrokeMove"
+    });
+
+    ElementView.prototype.initialize.call(this);
   },
   
   render: function() {
@@ -283,7 +282,7 @@ var AppView = Backbone.View.extend({
   },
 
   initialize: function() {
-    this.paper = new Raphael(this.el, 1000, 250);
+    this.paper = new Raphael(this.el, $(window).width() - 25, $(window).height() - 100);
 
     this.currentStroke = null;
 

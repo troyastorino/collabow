@@ -7,6 +7,10 @@ var Element = Backbone.Model.extend({
 
   defaults: {
     selected: false,
+  },
+
+  save: function(key, value, options) {
+    
   }
 });
 
@@ -37,21 +41,21 @@ var Stroke = Backbone.Model.extend({
     "stroke-width": 5,
     "stroke-linecap": "round",
     "stroke-linejoin": "round",
-    
   },
 
-  initialize: function() {
-/*    this.set({
+/*  initialize: function() {
+    this.set({
       id: uuid.v4(),
-    });*/
-  },
+    });
+  },*/
 
   set: function(attributes, options) {
     // if updating x and y, make sure to update path
-    if (attributes.x && attributes.y && this.get("path"))
-      this.get("path")[0] = ["M", attributes.x, attributes.y];
+    var path;
+    if (attributes.x && attributes.y && (path = this.get("path")))
+      path[0] = ["M", attributes.x, attributes.y];
 
-    Backbone.Model.prototype.set.call(this, attributes, options);
+    Element.prototype.set.call(this, _.extend({}, attributes, {path: path}), options);
   }
 });
 
@@ -79,5 +83,5 @@ var Paper = Backbone.Model.extend({
 });
 
 var Action = Backbone.Model.extend({
-  
-})
+
+});
