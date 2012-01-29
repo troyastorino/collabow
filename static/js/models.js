@@ -9,29 +9,38 @@ var Element = Backbone.Model.extend({
     selected: false,
   },
 
-  save: function(key, value, options) {
-    
-  }
 });
 
-var Stroke = Backbone.Model.extend({
-  addPoint: function(x, y) {
-    if (this.get("path")) {
-      this.get("path").push(["l", x - this.get("prevx"), y - this.get("prevy")]);
+var ElementCollection = Backbone.Collection.extend({
+  model: Element
+});
 
-      // setting these triggers the change event so the render
-      // function will fire
+window.modelTypes = {
+  STROKE: "Stroke",
+  RECT: "Rect"
+}
+
+var Stroke = Element.extend({
+  addPoint: function(x, y) {
+    var path;
+    if (path = this.get("path")) {
+      path.push(["l", x - this.get("prevx"), y - this.get("prevy")]);
+      this.patch({
+        path: path
+      });
       this.set({
         prevx: x,
         prevy: y
       });
     } else {
       this.set({
+        prevx: x,
+        prevy: y
+      });
+      this.patch({
         path: [["M", x, y]],
         x: x,
         y: y,
-        prevx: x,
-        prevy: y
       });
     }    
   },
@@ -43,23 +52,19 @@ var Stroke = Backbone.Model.extend({
     "stroke-linejoin": "round",
   },
 
-/*  initialize: function() {
-    this.set({
-      id: uuid.v4(),
-    });
-  },*/
-
   set: function(attributes, options) {
     // if updating x and y, make sure to update path
     var path;
     if (attributes.x && attributes.y && (path = this.get("path")))
       path[0] = ["M", attributes.x, attributes.y];
 
-    Element.prototype.set.call(this, _.extend({}, attributes, {path: path}), options);
-  }
+    return Element.prototype.set.call(this, _.extend({}, attributes, {path: path}), options);
+  },
+
+  type: window.modelTypes.STROKE
 });
 
-var Rect = Backbone.Model.extend({
+var Rect = Element.extend({
   defaults: {
     x: 0,
     y: 0,
@@ -68,20 +73,15 @@ var Rect = Backbone.Model.extend({
     stroke: "#000",
     "stroke-width": 1,
     fill: "#eee",
-  }
+  },
+
+  type: window.modelTypes.RECT,
 });
 
-var Elements = Backbone.Collection.extend({
-  model: Element,
-});
+// can't set key-value pairs in hash because would break on namespaced .
+window.models = {};
+window.models[window.modelTypes.STROKE] = Stroke;
+window.models[window.modelTypes.RECT] = Rect;
 
-var Paper = Backbone.Model.extend({
-  defaults: {
-    elements: new Elements,
-    selection: new Elements
-  }
-});
 
-var Action = Backbone.Model.extend({
 
-});

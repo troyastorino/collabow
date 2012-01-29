@@ -24,7 +24,7 @@ var utils = {
 
   setDragMove: function(dx, dy) {
     this.forEach(function(element) {
-      element.view.model.set({
+      element.view.model.patch({
         x: element.ox + dx,
         y: element.oy + dy
       });
@@ -57,12 +57,14 @@ var ElementView  = Backbone.View.extend({
     // create reference to Raphael object in addition to DOM element
     this.element = this.options.element;
     this.element.view = this;
-    this.el = this.element.node;
+    this.setElement(this.element.node, false);
 
+    // add to global list of elements
+    window.state.elements.add(this.model);
+    
     // bind to changes in the model
-    this.model.bind("change", this.render, this);
-//    this.model.bind("change", this.save, this);
-    this.model.bind("destroy", this.remove, this);
+    this.model.on("change", this.render, this);
+    this.model.on("destroy", this.remove, this);
 
     // initialize reference variables
     this.clickedDown = false;
@@ -103,11 +105,11 @@ var ElementView  = Backbone.View.extend({
         var selected = this.model.get("selected");
         if (selected) {
           if (!this.dragging) {
-            this.model.set({selected: false});
+            this.model.patch({selected: false});
             window.state.currentSelection.exclude(this.element);
           }
         } else {
-          this.model.set({selected: true});
+          this.model.patch({selected: true});
           window.state.currentSelection.push(this.element);
         }
       }
@@ -120,6 +122,7 @@ var ElementView  = Backbone.View.extend({
   },
 
   remove: function() {
+    window.state.elements.remove(this.model);
     if (this.glow) this.glow.remove();
     this.element.remove();
   },
@@ -132,7 +135,7 @@ var ElementView  = Backbone.View.extend({
 var StrokeView = ElementView.extend({
   handleStrokeMove: function() {
     if (window.state.mode === window.modes.ERASE && window.state.mousedown) {
-      this.remove();
+      this.destroyModel();
     }
   },
 
@@ -143,7 +146,7 @@ var StrokeView = ElementView.extend({
 
     ElementView.prototype.initialize.call(this);
   },
-  
+
   render: function() {
     this.element.attr({
       path: this.model.get("path"),
@@ -215,27 +218,33 @@ var RectView = ElementView.extend({
   }
 });
 
+// can't set key-value pairs in hash because would break on namespaced .
+window.views = {};
+window.views[window.modelTypes.STROKE] = StrokeView;
+window.views[window.modelTypes.RECT] = RectView
+
 var AppView = Backbone.View.extend({
   addRect: function() {
     var view = new RectView({
-      element: this.paper.rect(),
+      element: this.createElement(window.modelTypes.RECT),
       model: new Rect(),
     });
+    view.model.save();
     return view.element;
   },
 
   addPoint: function(e) {
-    this.currentStroke.addPoint(e.offsetX, e.offsetY);
+    this.currentStroke.addPoint(e.offsetX, e.offsetY, {updateServer: true});
   },
 
   clearCurrentMode: function() {
-    switch(window.state.mode){
+    switch(window.state.mode) {
     case window.modes.DRAW:
 
       break;
     case window.modes.SELECT:
       window.state.currentSelection.forEach(function(element) {
-        element.view.model.set({selected: false});
+        element.view.model.patch({selected: false});
       });
       window.state.currentSelection.clear();
       break;
@@ -245,12 +254,24 @@ var AppView = Backbone.View.extend({
     case window.modes.TEXT:
 
       break;
+    } 
+  },
+
+  createElement: function(modelType) {
+    switch(modelType) {
+    case window.modelTypes.STROKE:
+      return this.paper.path();
+      break;
+    case window.modelTypes.RECT:
+      return this.paper.rect();
+      break;
     }
   },
 
   delete: function() {
     window.state.currentSelection.forEach(function(element) {
-      element.view.model.destroy();
+      var model = element.view.model;
+      model.destroy();
     });
     window.state.currentSelection.clear();
   },
@@ -261,7 +282,7 @@ var AppView = Backbone.View.extend({
     case window.modes.DRAW:
       this.startStroke(e); 
       break;
-    case window.modes.ERASpE:
+    case window.modes.ERASE:
 
       break;
     }
@@ -281,6 +302,29 @@ var AppView = Backbone.View.extend({
     "mouseup" : "upHandler"
   },
 
+  executeAction: function(action) {
+    var Model = window.models[action.type]
+    var View = window.views[action.type];
+    switch (action.method) {
+    case "create":
+      var view = new View({
+        model: new Model(_.extend({
+          id: action.id,
+        }, JSON.parse(action.attrs))),
+        element: this.createElement(action.type)
+      });
+      break;
+    case "update":
+    case "patch":
+      window.state.elements.get(action.id).set(JSON.parse(action.attrs));
+      break;
+    case "delete":
+      window.state.elements.get(action.id).destroy();
+      break;
+    }
+    
+  },
+
   initialize: function() {
     this.paper = new Raphael(this.el, $(window).width() - 25, $(window).height() - 100);
 
@@ -294,6 +338,7 @@ var AppView = Backbone.View.extend({
     };
     
     window.state = {
+      elements: new ElementCollection,
       mode: window.modes.DRAW,
       mousedown: false,
       currentSelection: this.paper.set()
@@ -330,20 +375,23 @@ var AppView = Backbone.View.extend({
   setSelectMode: function() {
     this.clearCurrentMode();
 
-/*    this.paper.forEach(function(element) {
-      utils.makeDraggable(element);
-    });*/
-
     window.state.mode = window.modes.SELECT;
   },
 
   startStroke: function(e) {
     var view = new StrokeView({
-      element: this.paper.path(),
+      element: this.createElement(window.modelTypes.STROKE),
       model: new Stroke,
     });
+    view.model.save();
     this.currentStroke = view.model;
     this.addPoint(e);
+  },
+
+  testActions: function(actions) {
+    _.each(actions, function(action) {
+      this.executeAction(action);
+    }, this);
   },
 
   upHandler: function(e) {
