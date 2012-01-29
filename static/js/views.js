@@ -328,6 +328,8 @@ var AppView = Backbone.View.extend({
   initialize: function() {
     this.paper = new Raphael(this.el, $(window).width() - 25, $(window).height() - 100);
 
+    _.bindAll(this);
+
     this.currentStroke = null;
 
     window.modes = {
@@ -343,6 +345,8 @@ var AppView = Backbone.View.extend({
       mousedown: false,
       currentSelection: this.paper.set()
     };
+
+    window.socket.on('action', this.executeAction);
   },
 
   moveHandler: function(e) {

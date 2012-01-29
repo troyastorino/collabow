@@ -7,7 +7,8 @@ var connect = require('connect')
 //    , redis = require("./db/redis.js").redis
     , mongo = require('./db/mongo.js')
     , user = require("./routes/user.js")
-    , RedisStore = require('connect-redis')(express);
+    , RedisStore = require('connect-redis')(express)
+    , _ = require('underscore');
 
 //Setup Express
 var server = express.createServer();
@@ -63,8 +64,8 @@ server.listen(port);
 var io = io.listen(server);
 
 io.sockets.on('connection', function(socket) {
-  socket.on('addPoint', function(point) {
-    socket.broadcast.emit('addPoint', point);
+  socket.on('action', function(action) {
+    socket.broadcast.emit('action', action);
   });
 });
 
@@ -97,7 +98,7 @@ server.get('/:username', user.home);
 server.get("/space/:id", function(req, res) {
   var id = req.params.id;
   res.render('canvas.jade', {
-    locals: _.defaults(locals, {title: 'collabow - ' + id})
+    locals: _.defaults(utils.locals, {title: 'collabow - ' + id})
   });
 });
 

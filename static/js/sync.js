@@ -1,15 +1,13 @@
 var Action = function(method, type, id, attrs) {
-  this.methods = method;
+  this.method = method;
   this.type = type;
   this.id = id;
   this.attrs = attrs;
 }
 
-window.ActionTypes = {
-  
-};
-
 window.Actions = [];
+
+window.socket = io.connect();
 
 Backbone.sync = function(method, model, options) {
   var action = new Action(method, model.type);
@@ -34,4 +32,5 @@ Backbone.sync = function(method, model, options) {
   action.id = model.id;
 
   window.Actions.push(action);
+  window.socket.emit("action", action);
 };
