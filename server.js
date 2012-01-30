@@ -1,14 +1,17 @@
 //setup Dependencies
 var connect = require('connect')
     , express = require('express')
-    , io = require('socket.io')
+    , sio = require('socket.io')
+    , mongo = require('./db/mongo.js')
     , port = (process.env.PORT || 8081)
     , utils = require("./utils.js")
-//    , redis = require("./db/redis.js").redis
-    , mongo = require('./db/mongo.js')
     , user = require("./routes/user.js")
+//    , redis = require("./db/redis.js").redis
     , RedisStore = require('connect-redis')(express)
     , _ = require('underscore');
+
+var sessionKey = 'express.sid';
+var sessionStore = new RedisStore;
 
 //Setup Express
 var server = express.createServer();
@@ -18,7 +21,8 @@ server.configure(function(){
     server.use(express.cookieParser());
     server.use(express.session({
       secret: "bazinga",
-      store: new RedisStore,
+      key: sessionKey,
+      store: sessionStore,
       cookie: {
         maxAge: 100*24*60*60*1000
       }
@@ -61,11 +65,32 @@ server.error(function(err, req, res, next){
 server.listen(port);
 
 //Setup Socket.IO
-var io = io.listen(server);
+var io = sio.listen(server),
+    parseCookie = connect.utils.parseCookie;
+
+io.set('authorization', function(data, accept) {
+  if (data.headers.cookie) {
+    data.cookie = parseCookie(data.headers.cookie);
+    data.sessionID = data.cookie[sessionKey];
+    sessionStore.get(data.sessionID, function(err, session) {
+      if (err || !session) {
+        accept('Error', false);
+      } else {
+        data.session = session;
+        accept(null, true);
+      }
+    });
+  } else {
+    return accept("No cookie transmitted.", false);
+  }
+  accept(null, true);
+});
 
 io.sockets.on('connection', function(socket) {
+  var session = socket.handshake.session;
+  socket.join(session.space);
   socket.on('action', function(action) {
-    socket.broadcast.emit('action', action);
+    socket.broadcast.to(session.space).emit('action', action);
   });
 });
 
@@ -97,8 +122,12 @@ server.get('/:username', user.home);
 
 server.get("/space/:id", function(req, res) {
   var id = req.params.id;
+  req.session.space = id;
   res.render('canvas.jade', {
-    locals: _.defaults(utils.locals, {title: 'collabow - ' + id})
+    locals: _.extend({}, utils.locals, {
+      title: 'collabow - ' + id,
+      user: req.session.user
+    })
   });
 });
 

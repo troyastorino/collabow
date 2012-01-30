@@ -4,7 +4,8 @@ exports.home = function(req, res) {
   var user;
   if (user = req.session.user) {
     if (req.params.username === user.username) {
-      res.send("Welcome " + user.name);
+      res.render('home.jade', {locals: utils.locals});
+      
     } else {
       res.send("You are viewing " + req.params.username + "'s space.");
     }

@@ -1,5 +1,6 @@
 var mongoose = exports.mongoose = require("mongoose"),
     Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId,
     bcrypt = require('bcrypt'),
     _ = require('underscore');
 
@@ -15,6 +16,7 @@ var User = exports.User = mongoose.model("User", UserSchema);
 
 var SpaceSchema = new Schema({
   title: String,
+  id: ObjectId,
   creator: [{type: Schema.ObjectId, ref: 'User'}],
   users: [{type: Schema.ObjectId, ref: 'User'}],
 });

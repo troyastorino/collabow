@@ -3,7 +3,7 @@
  h3#tagline Brainstorm real-time <br> with anyone anywhere
 
  #nav
-   h3#username andrewdorne
+   h3#username=user.username
    input#userOptions(type='image', src='/images/options.png', alt='user options')
    h3#logout logout
    input#logoutIcon(type='image', src='/images/logout.png', alt='logout icon')
@@ -17,12 +17,11 @@
      input#textMode(type='image', src='/images/text.png', alt='textbox')
      input#delete(type='image', src='/images/delete.png', alt='delete')
 
-#canvas
 script(defer, src='/socket.io/socket.io.js')
 script(defer, src='/js/lib/underscore.js')
 script(defer, src='/js/lib/backbone.js')
 script(defer, src='/js/lib/raphael.js')
 script(defer, src='/js/sync.js')
-script(defer, src='/js/models.js')
-script(defer, src='/js/views.js')
+script(defer, src='/js/canvasModels.js')
+script(defer, src='/js/canvasViews.js')
 script(defer, src='/js/app.js')

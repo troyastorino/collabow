@@ -1,7 +1,7 @@
 exports.locals = { 
   title : 'collabow'
-  ,description: 'Your Page Description'
-  ,author: 'Your Name'
+  ,description: 'Brainstorm real-tile with anyone anywhere'
+  ,author: 'Troy Astorino'
   ,analyticssiteid: 'XXXXXXX' 
 };
 
