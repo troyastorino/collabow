@@ -146,11 +146,20 @@ var StrokeView = ElementView.extend({
 
     ElementView.prototype.initialize.call(this);
   },
-
+  
   render: function() {
+    
+    // get color
+    if ($("#color").val()) {
+      var tempColor = $("#color").val()
+    }
+    else {
+      var tempColor = "#000"
+    }
+    
     this.element.attr({
       path: this.model.get("path"),
-      stroke: this.model.get("stroke"),
+      stroke: tempColor,
       "stroke-width": this.model.get("stroke-width"),
       "stroke-linecap": this.model.get("stroke-linecap"),
       "strokpe-linejoin": this.model.get("stroke-linejoin")
@@ -177,19 +186,7 @@ var StrokeView = ElementView.extend({
 });
 
 var RectView = ElementView.extend({
-  render: function() {
-    // draw rectangle
-    this.element.attr({
-      x: this.model.get("x"),
-      y: this.model.get("y"),
-      fill: this.model.get("fill"),
-      stroke: this.model.get("stroke"),
-      "stroke-width": this.model.get("stroke-width"),
-      width: this.model.get("width"),
-      height: this.model.get("height")
-    });
-
-    // add glow for selection
+  renderGlow: function() {
     if (this.model.get("selected")) {
       if (!this.glow) this.glow = this.element.glow({
         color: "#4D90FE",
@@ -213,7 +210,40 @@ var RectView = ElementView.extend({
         this.glow = null;
       }
     }
+  },
+
+  render: function() {
+    // draw rectangle
+    this.element.attr({
+      x: this.model.get("x"),
+      y: this.model.get("y"),
+      fill: this.model.get("fill"),
+      stroke: this.model.get("stroke"),
+      "stroke-width": this.model.get("stroke-width"),
+      width: this.model.get("width"),
+      height: this.model.get("height")
+    });
+
+    // add glow for selection
+    this.renderGlow();
     
+    return this;
+  }
+});
+
+var ImgView = RectView.extend({
+  render: function() {
+    this.element.attr({
+      x: this.model.get("x"),
+      y: this.model.get("y"),
+      src: this.model.get("src"),
+      width: this.model.get("width"),
+      height: this.model.get("height")
+    });
+
+    // add glow
+    this.renderGlow();
+
     return this;
   }
 });
@@ -221,9 +251,31 @@ var RectView = ElementView.extend({
 // can't set key-value pairs in hash because would break on namespaced .
 window.views = {};
 window.views[window.modelTypes.STROKE] = StrokeView;
-window.views[window.modelTypes.RECT] = RectView
+window.views[window.modelTypes.RECT] = RectView;
+window.views[window.modelTypes.IMG] = ImgView;
 
 var AppView = Backbone.View.extend({
+  changeColor: function() {
+    
+  },
+  
+  addImage: function() {
+    // Create a temperary image for height and width
+    var tempImg = new Image();
+    tempImg.src = $("#url").val();
+    
+    var view = new ImgView({
+      element : this.createElement(window.modelTypes.IMG),
+      model: new Img(),
+    });
+    view.model.save({
+      width: tempImg.width,
+      height: tempImg.height,
+      src: $("#url").val(),
+    });
+    return view.element;
+  },
+  
   addRect: function() {
     var view = new RectView({
       element: this.createElement(window.modelTypes.RECT),
@@ -265,6 +317,9 @@ var AppView = Backbone.View.extend({
     case window.modelTypes.RECT:
       return this.paper.rect();
       break;
+    case window.modelTypes.IMG:
+      return this.paper.image();
+      break;
     }
   },
 
@@ -292,6 +347,7 @@ var AppView = Backbone.View.extend({
 
 
   events: {
+    "click #addImage": "addImage",
     "click #addRect": "addRect",
     "click #delete": "delete",
     "click #drawMode": "setDrawMode",

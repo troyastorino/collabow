@@ -17,7 +17,8 @@ var ElementCollection = Backbone.Collection.extend({
 
 window.modelTypes = {
   STROKE: "Stroke",
-  RECT: "Rect"
+  RECT: "Rect",
+  IMG: "Img"
 }
 
 var Stroke = Element.extend({
@@ -78,10 +79,23 @@ var Rect = Element.extend({
   type: window.modelTypes.RECT,
 });
 
+var Img = Rect.extend({
+  defaults: {
+    x: 10,
+    y: 10,
+    src: "http://images.pictureshunt.com/pics/k/kitten-8363.jpg",
+    width: 100,
+    height: 200,
+  },
+  
+  type: window.modelTypes.IMG,
+});
+
 // can't set key-value pairs in hash because would break on namespaced .
 window.models = {};
 window.models[window.modelTypes.STROKE] = Stroke;
 window.models[window.modelTypes.RECT] = Rect;
+window.models[window.modelTypes.IMG] = Img;
 
 
 
