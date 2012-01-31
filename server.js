@@ -6,6 +6,7 @@ var connect = require('connect')
     , port = (process.env.PORT || 8081)
     , utils = require("./utils.js")
     , user = require("./routes/user.js")
+    , space = require("./routes/space.js")
 //    , redis = require("./db/redis.js").redis
     , RedisStore = require('connect-redis')(express)
     , _ = require('underscore');
@@ -88,12 +89,13 @@ io.set('authorization', function(data, accept) {
 
 io.sockets.on('connection', function(socket) {
   var session = socket.handshake.session;
-  socket.join(session.space);
-  socket.on('action', function(action) {
-    socket.broadcast.to(session.space).emit('action', action);
+  var space;
+  if (session && (space = session.space)) {
+    socket.join(space);
+    socket.on('action', function(action) {
+    socket.broadcast.to(space).emit('action', action);
   });
-});
-
+}});
 
 // Routes
 server.get('/', function(req,res){
@@ -116,20 +118,22 @@ server.get('/login', user.login);
 
 server.post('/login', user.loginUser(mongo));
 
+// user must be logged in to see all pages after this
+server.all('/*', function(req, res, next) {
+  if (req.session.user) {
+    next();
+  } else {
+    res.redirect("/login");
+  }
+});
+
 server.all('/logout', user.logout);
 
-server.get('/:username', user.home);
+server.get('/:username', user.home(mongo));
 
-server.get("/space/:id", function(req, res) {
-  var id = req.params.id;
-  req.session.space = id;
-  res.render('canvas.jade', {
-    locals: _.extend({}, utils.locals, {
-      title: 'collabow - ' + id,
-      user: req.session.user
-    })
-  });
-});
+server.get("/space/:id", space.read);
+
+server.post("/space", space.create(mongo));
 
 //A Route for Creating a 500 Error (Useful to keep around)
 server.get('/500', function(req, res){
@@ -141,7 +145,7 @@ server.get('/*', function(req, res){
     throw new NotFound;
 });
 
-function NotFound(msg){
+function NotFound(msg) {
     this.name = 'NotFound';
     Error.call(this, msg);
     Error.captureStackTrace(this, arguments.callee);

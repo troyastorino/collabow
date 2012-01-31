@@ -1,16 +1,26 @@
 var utils = require("../utils.js");
 
-exports.home = function(req, res) {
-  var user;
-  if (user = req.session.user) {
-    if (req.params.username === user.username) {
-      res.render('home.jade', {locals: utils.locals});
-      
+exports.home = function(mongo) {
+  return function(req, res) {
+    var user;
+    if (user = req.session.user) {
+      if (req.params.username === user.username) {
+         mongo.User.findOne({username: user.username}, function(err, user) {
+          if (err) {
+            res.send("err: " + err);
+          }
+          res.render('home.jade', {
+            locals: utils.locals,
+            user: user,
+          });
+        });
+        
+      } else {
+        res.send("You are viewing " + req.params.username + "'s space.");
+      }
     } else {
-      res.send("You are viewing " + req.params.username + "'s space.");
+      res.send("Please login");
     }
-  } else {
-    res.send("Please login");
   }
 };
 
