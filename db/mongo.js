@@ -1,5 +1,6 @@
 var mongoose = exports.mongoose = require("mongoose"),
     Schema = mongoose.Schema,
+    ObjectId = Schema.ObjectId,
     bcrypt = require('bcrypt'),
     _ = require('underscore');
 
@@ -15,7 +16,7 @@ var User = exports.User = mongoose.model("User", UserSchema);
 
 var SpaceSchema = new Schema({
   title: String,
-  creator: [{type: Schema.ObjectId, ref: 'User'}],
+  creator: {type: Schema.ObjectId, ref: 'User'},
   users: [{type: Schema.ObjectId, ref: 'User'}],
 });
 
@@ -23,16 +24,14 @@ var Space = exports.Space = mongoose.model("Space", SpaceSchema);
 
 // removes password hash from user
 var sanitizeUser = function(user) {
-  return _.extend({hash: undefined}, user);
+  return _.extend(user, {hash: undefined});
 };
 
 // newUser has attributes name, username, email, password
 // fn should be function(error, user)
 exports.createUser = function(newUser, fn) {
   var user = new User;
-  user.name = newUser.name;
-  user.username = newUser.username;
-  user.email = newUser.email;
+  _.extend(user, newUser, {password: undefined});
   bcrypt.genSalt(function(err, salt) {
     if (err) fn(err);
     else {
@@ -69,7 +68,7 @@ exports.loginUser = function(user, fn) {
     });
   };
   
-  User.findOne({email: login}, function(err, user) {
+  User.findOne({email: login}).populate('spaces').run(function(err, user) {
     if (err) fn(err);
     else {
       if (user) {
@@ -86,3 +85,24 @@ exports.loginUser = function(user, fn) {
   });
 };
 
+// callback function of err, space
+exports.createSpace = function(title, creator, fn) {
+  var space = new Space;
+  space.title = title;
+  User.findOne({username: creator}, function(err, user) {
+    if (err) fn(err);
+    else {
+      space.creator = user._id;
+      space.users.push(user._id);
+      space.save(function(err) {
+        if (err) fn(err);
+        else {
+          Space.findById(space._id).populate('creator', ['name', 'username']).run(function(err, space) {
+            if (err) fn(err);
+            else fn(null, space);
+          });
+        }
+      });
+    }
+  });
+}

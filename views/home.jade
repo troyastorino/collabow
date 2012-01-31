@@ -1,0 +1,13 @@
+#spaces
+  ul#space-list
+  #createSpace
+    input#new-space(placeholder='Space name', type='text')
+    input#create-space(type='submit') Create space!
+
+script#space-template(type='text/template')
+  a.title(href="<% print(creator.name + '/' + title)%>")><%= title %>
+  p.creator <%= creator.name %>
+
+script(defer, src='/js/lib/underscore.js')
+script(defer, src='/js/lib/backbone.js')
+script(defer, src='/js/home.js')

@@ -1,13 +1,18 @@
 //setup Dependencies
 var connect = require('connect')
     , express = require('express')
-    , io = require('socket.io')
+    , sio = require('socket.io')
+    , mongo = require('./db/mongo.js')
     , port = (process.env.PORT || 8081)
     , utils = require("./utils.js")
-//    , redis = require("./db/redis.js").redis
-    , mongo = require('./db/mongo.js')
     , user = require("./routes/user.js")
-    , RedisStore = require('connect-redis')(express);
+    , space = require("./routes/space.js")
+//    , redis = require("./db/redis.js").redis
+    , RedisStore = require('connect-redis')(express)
+    , _ = require('underscore');
+
+var sessionKey = 'express.sid';
+var sessionStore = new RedisStore;
 
 //Setup Express
 var server = express.createServer();
@@ -17,7 +22,8 @@ server.configure(function(){
     server.use(express.cookieParser());
     server.use(express.session({
       secret: "bazinga",
-      store: new RedisStore,
+      key: sessionKey,
+      store: sessionStore,
       cookie: {
         maxAge: 100*24*60*60*1000
       }
@@ -60,14 +66,36 @@ server.error(function(err, req, res, next){
 server.listen(port);
 
 //Setup Socket.IO
-var io = io.listen(server);
+var io = sio.listen(server),
+    parseCookie = connect.utils.parseCookie;
 
-io.sockets.on('connection', function(socket) {
-  socket.on('addPoint', function(point) {
-    socket.broadcast.emit('addPoint', point);
-  });
+io.set('authorization', function(data, accept) {
+  if (data.headers.cookie) {
+    data.cookie = parseCookie(data.headers.cookie);
+    data.sessionID = data.cookie[sessionKey];
+    sessionStore.get(data.sessionID, function(err, session) {
+      if (err || !session) {
+        accept('Error', false);
+      } else {
+        data.session = session;
+        accept(null, true);
+      }
+    });
+  } else {
+    return accept("No cookie transmitted.", false);
+  }
+  accept(null, true);
 });
 
+io.sockets.on('connection', function(socket) {
+  var session = socket.handshake.session;
+  var space;
+  if (session && (space = session.space)) {
+    socket.join(space);
+    socket.on('action', function(action) {
+    socket.broadcast.to(space).emit('action', action);
+  });
+}});
 
 // Routes
 server.get('/', function(req,res){
@@ -90,16 +118,22 @@ server.get('/login', user.login);
 
 server.post('/login', user.loginUser(mongo));
 
+// user must be logged in to see all pages after this
+server.all('/*', function(req, res, next) {
+  if (req.session.user) {
+    next();
+  } else {
+    res.redirect("/login");
+  }
+});
+
 server.all('/logout', user.logout);
 
-server.get('/:username', user.home);
+server.get('/:username', user.home(mongo));
 
-server.get("/space/:id", function(req, res) {
-  var id = req.params.id;
-  res.render('canvas.jade', {
-    locals: _.defaults(locals, {title: 'collabow - ' + id})
-  });
-});
+server.get("/space/:id", space.read);
+
+server.post("/space", space.create(mongo));
 
 //A Route for Creating a 500 Error (Useful to keep around)
 server.get('/500', function(req, res){
@@ -111,7 +145,7 @@ server.get('/*', function(req, res){
     throw new NotFound;
 });
 
-function NotFound(msg){
+function NotFound(msg) {
     this.name = 'NotFound';
     Error.call(this, msg);
     Error.captureStackTrace(this, arguments.callee);

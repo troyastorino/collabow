@@ -1,9 +1,27 @@
-#header
-  p Collabow
+#top
+ img#logo(src='/images/collabow.png', alt='collabow logo with bowtie!')
+ h3#tagline Brainstorm real-time <br> with anyone anywhere
 
-#canvas
+ #nav
+   h3#username=user.username
+   input#userOptions(type='image', src='/images/options.png', alt='user options')
+   h3#logout logout
+   input#logoutIcon(type='image', src='/images/logout.png', alt='logout icon')
+
+ #paper
+   #tools
+     input#drawMode(type='image', src='/images/draw.png', alt='draw mode')
+     input#eraseMode(type='image', src='/images/erase.png', alt='erase mode')
+     input#selectMode(type='image', src='/images/select.png', alt='select mode')
+     input#addRect(type='image', src='/images/rect.png', alt='rect')
+     input#textMode(type='image', src='/images/text.png', alt='textbox')
+     input#delete(type='image', src='/images/delete.png', alt='delete')
+
 script(defer, src='/socket.io/socket.io.js')
-script(defer, src='/js/lib/kinetic-v3.5.2.js')
-script(defer, src='/js/lib/uuid.js')
-script(defer, src='/js/strokes.js')
-script(defer, src='/js/canvas.js')
+script(defer, src='/js/lib/underscore.js')
+script(defer, src='/js/lib/backbone.js')
+script(defer, src='/js/lib/raphael.js')
+script(defer, src='/js/sync.js')
+script(defer, src='/js/canvasModels.js')
+script(defer, src='/js/canvasViews.js')
+script(defer, src='/js/app.js')
