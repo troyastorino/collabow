@@ -16,7 +16,7 @@ Backbone.sync = function(method, model, options) {
   case "read":
     break;
   case "create":
-    model.id = _.uniqueId();
+    model.set({id: _.uniqueId()});
     action.attrs = JSON.stringify(model.toJSON());
     break;
   case "update":
@@ -28,6 +28,8 @@ Backbone.sync = function(method, model, options) {
     action.attrs = JSON.stringify(options.attrs);
     break;
   }
+
+  options.success(model);
 
   action.id = model.id;
 

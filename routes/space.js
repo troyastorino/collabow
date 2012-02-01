@@ -7,7 +7,7 @@ exports.read = function(req, res) {
   res.render('canvas.jade', {
     locals: _.extend({}, utils.locals, {
       title: 'collabow - ' + id,
-      user: req.session.user
+      username: req.session.user.username
     })
   });
 };
@@ -22,3 +22,14 @@ exports.create = function(mongo) {
     });
   };
 };
+
+exports.public = function(req, res) {
+  var id = req.params.space;
+  req.session.space = id;
+  res.render('canvas.jade', {
+    locals: _.extend({}, utils.locals, {
+      title: 'collabow - ' + id,
+      username: 'anonymous'
+    })
+  });
+}

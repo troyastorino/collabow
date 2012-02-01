@@ -338,7 +338,7 @@
         attrs = {};
         attrs[key] = value;
       }
-      
+
       options = _.extend({}, options, {patch: true});
 
       return this.save(attrs, options);
@@ -1183,7 +1183,7 @@
         params.data = JSON.stringify(model.toJSON());
       } else if (method == 'patch') {
         params.data = JSON.stringify(
-          _.extend({}, options.attrs, {id: this.model.get("id")}));
+          _.extend({}, options.attrs, {id: this.model.get("id")}).toJSON());
       }
     }
 

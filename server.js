@@ -3,8 +3,10 @@ var connect = require('connect')
     , express = require('express')
     , sio = require('socket.io')
     , mongo = require('./db/mongo.js')
+    , parseCookie = connect.utils.parseCookie
     , port = (process.env.PORT || 8081)
     , utils = require("./utils.js")
+    , url = require('url')
     , user = require("./routes/user.js")
     , space = require("./routes/space.js")
 //    , redis = require("./db/redis.js").redis
@@ -12,10 +14,29 @@ var connect = require('connect')
     , _ = require('underscore');
 
 var sessionKey = 'express.sid';
-var sessionStore = new RedisStore;
+var sessionStore;
 
 //Setup Express
 var server = express.createServer();
+
+server.configure('development', function() {
+  mongo.mongoose.connect("mongodb://localhost/collabow");
+  sessionStore = new RedisStore;
+//  client = redis.createClient();
+});
+
+server.configure('production', function() {
+  console.log("configuring");
+  mongo.mongoose.connect("mongodb://nodejitsu:344cef5563d74c877f29391ca5f5de74@staff.mongohq.com:10024/nodejitsudb561834104672");
+  var redisUrl = url.parse("redis://nodejitsu:8329aed4aaf88eeddc4a66ddab459498@dogfish.redistogo.com:9459/"),
+      redisAuth = redisUrl.auth.split(':');
+  sessionStore = new RedisStore({
+    host: redisUrl.hostname,
+    port: redisUrl.port,
+    db: redisAuth[0],
+    pass: redisAuth[1]});
+});
+
 server.configure(function(){
     server.set('views', __dirname + '/views');
     server.use(express.bodyParser());
@@ -30,18 +51,6 @@ server.configure(function(){
     }));
     server.use(connect.static(__dirname + '/static'));
     server.use(server.router);
-});
-
-// variables to be defined in specific configuration
-var client;
-
-server.configure('development', function() {
-  mongo.mongoose.connect("mongodb://localhost/collabow");
-//  client = redis.createClient();
-});
-
-server.configure('production', function() {
-
 });
 
 //setup the errors
@@ -66,8 +75,15 @@ server.error(function(err, req, res, next){
 server.listen(port);
 
 //Setup Socket.IO
-var io = sio.listen(server),
-    parseCookie = connect.utils.parseCookie;
+var io = sio.listen(server);
+
+io.configure('production', function() {
+  io.set('log level', 1);
+});
+
+io.configure('development', function() {
+  io.set('log level', 3);
+});
 
 io.set('authorization', function(data, accept) {
   if (data.headers.cookie) {
@@ -93,9 +109,10 @@ io.sockets.on('connection', function(socket) {
   if (session && (space = session.space)) {
     socket.join(space);
     socket.on('action', function(action) {
-    socket.broadcast.to(space).emit('action', action);
-  });
-}});
+      socket.broadcast.to(space).emit('action', action);
+    });
+  }
+});
 
 // Routes
 server.get('/', function(req,res){
@@ -117,6 +134,8 @@ server.post('/signup', user.createUser(mongo));
 server.get('/login', user.login);
 
 server.post('/login', user.loginUser(mongo));
+
+server.get('/public/:space', space.public);
 
 // user must be logged in to see all pages after this
 server.all('/*', function(req, res, next) {
@@ -151,4 +170,3 @@ function NotFound(msg) {
     Error.captureStackTrace(this, arguments.callee);
 }
 
-console.log('Listening on http://0.0.0.0:' + port );

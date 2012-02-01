@@ -33,10 +33,6 @@ var utils = {
 };
 
 var ElementView  = Backbone.View.extend({
-  destroyModel: function() {
-    this.model.destroy();
-  },
-
   downHandler: function() {
     this.clickedDown = true;
     switch(window.state.mode) {
@@ -53,7 +49,7 @@ var ElementView  = Backbone.View.extend({
     "mouseup.element": "upHandler"
   },
 
-  initialize: function() {
+  initialize: function(attrs, options) {
     // create reference to Raphael object in addition to DOM element
     this.element = this.options.element;
     this.element.view = this;
@@ -135,7 +131,7 @@ var ElementView  = Backbone.View.extend({
 var StrokeView = ElementView.extend({
   handleStrokeMove: function() {
     if (window.state.mode === window.modes.ERASE && window.state.mousedown) {
-      this.destroyModel();
+      this.model.destroy();
     }
   },
 
@@ -278,9 +274,10 @@ var AppView = Backbone.View.extend({
 
   downHandler: function(e) {
     window.state.mousedown = true;
+    window.state.downEvent = e;
     switch (window.state.mode) {
     case window.modes.DRAW:
-      this.startStroke(e); 
+
       break;
     case window.modes.ERASE:
 
@@ -297,12 +294,12 @@ var AppView = Backbone.View.extend({
     "click #drawMode": "setDrawMode",
     "click #eraseMode": "setEraseMode",
     "click #selectMode": "setSelectMode",
-    "mousedown" : "downHandler",
-    "mousemove" : "moveHandler",
-    "mouseup" : "upHandler"
+    "mousedown svg" : "downHandler",
+    "mousemove svg" : "moveHandler",
+    "mouseup svg" : "upHandler"
   },
 
-  executeAction: function(action) {
+  executeIncomingAction: function(action) {
     var Model = window.models[action.type]
     var View = window.views[action.type];
     switch (action.method) {
@@ -310,7 +307,7 @@ var AppView = Backbone.View.extend({
       var view = new View({
         model: new Model(_.extend({
           id: action.id,
-        }, JSON.parse(action.attrs))),
+        }, JSON.parse(action.attrs)), {silent: true}),
         element: this.createElement(action.type)
       });
       break;
@@ -319,7 +316,7 @@ var AppView = Backbone.View.extend({
       window.state.elements.get(action.id).set(JSON.parse(action.attrs));
       break;
     case "delete":
-      window.state.elements.get(action.id).destroy();
+      window.state.elements.get(action.id).destroy({silent: true});
       break;
     }
     
@@ -346,13 +343,16 @@ var AppView = Backbone.View.extend({
       currentSelection: this.paper.set()
     };
 
-    window.socket.on('action', this.executeAction);
+    window.socket.on('action', this.executeIncomingAction);
   },
 
   moveHandler: function(e) {
     switch (window.state.mode) {
     case window.modes.DRAW:
       if (this.currentStroke) {
+        this.addPoint(e);
+      } else if (window.state.mousedown) {
+        this.startStroke(window.state.downEvent);
         this.addPoint(e);
       }
       break;
@@ -392,14 +392,9 @@ var AppView = Backbone.View.extend({
     this.addPoint(e);
   },
 
-  testActions: function(actions) {
-    _.each(actions, function(action) {
-      this.executeAction(action);
-    }, this);
-  },
-
   upHandler: function(e) {
     window.state.mousedown = false;
+    window.state.downEvent = null;
     switch (window.state.mode) {
     case window.modes.DRAW:
       if (this.currentStroke) {
