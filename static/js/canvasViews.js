@@ -30,6 +30,24 @@ var utils = {
       });
     });
   },
+
+  touchify: function(events) {
+    var eventsMap = {
+      'click': 'touchstart',
+      'mousedown': 'touchstart',
+      'mousemove': 'touchmove',
+      'mouseup': 'touchend'
+    };
+    _.each(events, function(value, key) {
+      _.each(eventsMap, function(eventVal, eventKey) {
+        var regex = new RegExp(eventKey);
+        if (regex.test(key)) {
+          events[key.replace(regex, eventVal)] = value;
+          delete events[key];
+        }
+      });
+    });
+  }
 };
 
 var ElementView  = Backbone.View.extend({
@@ -66,8 +84,10 @@ var ElementView  = Backbone.View.extend({
     this.clickedDown = false;
     this.dragging = false;
 
-    // delegate events and render
+    // add touch events
+    if (Modernizr.touch) utils.touchify(this.events);
     this.delegateEvents();
+
     this.render();
   },
 
@@ -125,7 +145,9 @@ var ElementView  = Backbone.View.extend({
 
   render: function() {
 
-  }
+  },
+
+  
 });
 
 var StrokeView = ElementView.extend({
@@ -145,17 +167,9 @@ var StrokeView = ElementView.extend({
   
   render: function() {
     
-    // get color
-    if ($("#color").val()) {
-      var tempColor = $("#color").val()
-    }
-    else {
-      var tempColor = "#000"
-    }
-    
     this.element.attr({
       path: this.model.get("path"),
-      stroke: tempColor,
+      stroke: this.model.get("stroke"),
       "stroke-width": this.model.get("stroke-width"),
       "stroke-linecap": this.model.get("stroke-linecap"),
       "strokpe-linejoin": this.model.get("stroke-linejoin")
@@ -282,7 +296,10 @@ var AppView = Backbone.View.extend({
   },
 
   addPoint: function(e) {
-    this.currentStroke.addPoint(e.offsetX, e.offsetY, {updateServer: true});
+    (e.originalEvent || e).preventDefault();
+    var x = e.pageX || e.originalEvent.pageX,
+        y = e.pageY || e.originalEvent.pageY;
+    this.currentStroke.addPoint(x - window.state.svgX, y - window.state.svgY, {updateServer: true});
   },
 
   clearCurrentMode: function() {
@@ -381,8 +398,6 @@ var AppView = Backbone.View.extend({
   initialize: function() {
     this.paper = new Raphael(this.el, $(window).width() - 25, $(window).height() - 100);
 
-    _.bindAll(this);
-
     this.currentStroke = null;
 
     window.modes = {
@@ -396,8 +411,21 @@ var AppView = Backbone.View.extend({
       elements: new ElementCollection,
       mode: window.modes.DRAW,
       mousedown: false,
-      currentSelection: this.paper.set()
+      currentSelection: this.paper.set(),
+      paper: this.paper,
+      svgX: this.paper.canvas.offsetLeft,
+      svgY: this.paper.canvas.offsetTop
     };
+
+    
+    if (Modernizr.touch) {
+      utils.touchify(this.events);
+      this.$el.on('touchstart', function(e) {
+        e.preventDefault();
+      });
+    }
+    _.bindAll(this);
+    this.delegateEvents();
 
     window.socket.on('action', this.executeIncomingAction);
   },
@@ -439,9 +467,10 @@ var AppView = Backbone.View.extend({
   },
 
   startStroke: function(e) {
+    var color = $("#color").val();
     var view = new StrokeView({
       element: this.createElement(window.modelTypes.STROKE),
-      model: new Stroke,
+      model: new Stroke(color ? {stroke: color} : {}),
     });
     view.model.save();
     this.currentStroke = view.model;
@@ -454,7 +483,7 @@ var AppView = Backbone.View.extend({
     switch (window.state.mode) {
     case window.modes.DRAW:
       if (this.currentStroke) {
-        this.addPoint(e);
+        if (!Modernizr.touch) this.addPoint(e);
         this.currentStroke = null;
       }
       break;
